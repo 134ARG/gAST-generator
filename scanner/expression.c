@@ -3,7 +3,7 @@
 //
 
 #include "expression.h"
-#include "../data_structure/stack.h"
+#include "../lib/stack.h"
 #include <malloc.h>
 #include <string.h>
 #include "scanner_globals.h"

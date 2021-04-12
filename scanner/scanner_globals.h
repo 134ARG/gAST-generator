@@ -8,7 +8,7 @@
 
 #define FUNCSIZE 5
 
-#include "../data_structure/stack.h"
+#include "../lib/stack.h"
 
 //extern int lineno;
 //extern char *Text;

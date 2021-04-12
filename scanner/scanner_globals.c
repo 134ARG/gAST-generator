@@ -3,7 +3,7 @@
 //
 
 #include <string.h>
-#include "../data_structure/stack.h"
+#include "../lib/stack.h"
 #include "expression.h"
 #include "scanner_globals.h"
 #include "../shared/ctool.h"

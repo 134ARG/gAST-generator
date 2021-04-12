@@ -10,10 +10,8 @@
 
 typedef struct ast_node{
     int type;
-    union {
-        symbol *atom;
-        stack *expr;
-    } value;
+    size_t code;
+    stack *expr;
 } ast_node;
 
 ast_node *make_atom(symbol *s);

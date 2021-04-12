@@ -7,8 +7,8 @@
 #include "spredicate.h"
 #include "../shared/sscanner.h"
 #include "scanner_globals.h"
-#include "../data_structure/stack.h"
-#include "../data_structure/sstring.h"
+#include "../lib/stack.h"
+#include "../lib/sstring.h"
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
@@ -108,11 +108,11 @@ int next_token_s() {
     int token_code = languagep(s, &index);  // find token id
     if (token_code != -1) {
         const char *token = get(&token_names, token_code);
-        printf("%.*s: %s\n", (int) (index - prev), s + prev, token);
+        //printf("%.*s: %s\n", (int) (index - prev), s + prev, token);
         if (text) free(text);
         text = malloc(sizeof(char) * (index - prev + 1));
         strncpy(text, s+prev, index-prev);
-        printf("token code:%ul\n", token_code);
+        //printf("token code:%ul\n", token_code);
         return token_code;
     } else {    // token not found
         scan_error(s);

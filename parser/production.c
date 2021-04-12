@@ -145,41 +145,5 @@ void parse_table() {
 
 }
 
-symbol *recursive_apply(symbol *s, int token, ast_node *result) {
-    if (s->type == TERMINAL) {
-        if (s->value.token_id == token) {
-            push_node(result, make_atom(s));
-            return s;
-        } else {
-            clean_ast(result);
-            return NULL;
-        }
-    }
 
-    for (int i = 0; i < s->value.productions->length; i++) {
-        stack *p = get(s->value.productions, i);
-        symbol *first = get(p, 0);
-
-        if (recursive_apply(first, token, result)) {
-            for (int j = 1; j < p->length; j++) {
-                symbol *t = get(p, j);
-                token = next_token_s();
-                if (token != -1) {
-                    symbol *r = recursive_apply(t, token, result);
-                    if (!r) {
-                        clean(result);
-                        return NULL;
-                    }
-                } else {
-                    clean(result);
-                    return NULL;
-                }
-
-            }
-            push(result, s);
-            return s;
-        }
-    }
-    return NULL;
-}
 

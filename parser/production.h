@@ -5,7 +5,7 @@
 #ifndef CSCANNER_PRODUCTION_H
 #define CSCANNER_PRODUCTION_H
 
-#include "../data_structure/stack.h"
+#include "../lib/stack.h"
 #include "stdlib.h"
 
 typedef enum {TERMINAL, NONTERMINAL, } symbol_type;
@@ -28,6 +28,5 @@ void destruct_symbol(symbol *s);
 void new_production(symbol *s);
 void extend_by_name(symbol *s, const char *name);
 void reduce_left_recursion(symbol *s);
-symbol *recursive_apply(symbol *s, int token, stack *result);
 
 #endif //CSCANNER_PRODUCTION_H

@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "sparser.h"
-#include "../data_structure/stack.h"
+#include "../lib/stack.h"
 #include "scanner_main.h"
 #include "scanner_globals.h"
 

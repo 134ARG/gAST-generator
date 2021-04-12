@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "../data_structure/sstring.h"
+#include "../lib/sstring.h"
 #include "ctool.h"
 
 static FILE *input = NULL;

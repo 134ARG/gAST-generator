@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include "sparser.h"
 #include "../shared/sscanner.h"
-#include "../data_structure/stack.h"
+#include "../lib/stack.h"
 #include "expression.h"
 #include "../shared/ctool.h"
 #include "scanner_globals.h"

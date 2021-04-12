@@ -4,7 +4,7 @@
 
 #include "spredicate.h"
 #include "expression.h"
-#include "../data_structure/stack.h"
+#include "../lib/stack.h"
 #include "string.h"
 
 #define TRUE 1
