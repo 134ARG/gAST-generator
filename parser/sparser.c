@@ -3,7 +3,7 @@
 //
 
 #include "sparser.h"
-#include "../shared/sscanner.h"
+#include "../lib/sscanner.h"
 #include "parser_globals.h"
 #include "production.h"
 #include <stdio.h>

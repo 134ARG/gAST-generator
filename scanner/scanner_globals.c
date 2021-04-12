@@ -6,7 +6,7 @@
 #include "../lib/stack.h"
 #include "expression.h"
 #include "scanner_globals.h"
-#include "../shared/ctool.h"
+#include "../lib/ctool.h"
 
 
 // for scanner (both for script and source file)

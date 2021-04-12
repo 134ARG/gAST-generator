@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "sparser.h"
-#include "../shared/sscanner.h"
+#include "../lib/sscanner.h"
 #include "../lib/stack.h"
 #include "expression.h"
-#include "../shared/ctool.h"
+#include "../lib/ctool.h"
 #include "scanner_globals.h"
 
 extern char *Text;

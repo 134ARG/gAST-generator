@@ -5,7 +5,7 @@
 
 #include "scanner_main.h"
 #include "spredicate.h"
-#include "../shared/sscanner.h"
+#include "../lib/sscanner.h"
 #include "scanner_globals.h"
 #include "../lib/stack.h"
 #include "../lib/sstring.h"
