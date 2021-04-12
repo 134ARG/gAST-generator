@@ -1,0 +1,40 @@
+(cat int) INT
+(cat main) MAIN
+(cat void) VOID
+(cat break) BREAK
+(cat do) DO
+(cat else) ELSE
+(cat if) IF
+(cat while) WHILE
+(cat return) RETURN
+(cat scanf) READ
+(cat printf) WRITE
+(cat {) LBRACE
+(cat }) RBRACE
+(cat [) LSQUARE
+(cat ]) RSQUARE
+(cat \() LPAR
+(cat \)) RPAR
+(cat ;) SEMI
+(cat +) PLUS
+(cat -) MINUS
+(cat *) MUL_OP
+(cat /) DIV_OP
+(cat &) AND_OP
+(cat |) OR_OP
+(cat !) NOT_OP
+(cat =) ASSIGN
+(cat <) LT
+(cat >) GT
+(cat <<) SHL_OP
+(cat >>) SHR_OP
+(cat ==) EQ
+(cat !=) NOTEQ
+(cat <=) LTEQ
+(cat >=) GTEQ
+(cat &&) ANDAND
+(cat ||) OROR
+(cat ,) COMMA
+(pls (range 0 9)) INT_NUM
+(cat (pls (or (range a z) (range A Z)))
+	(mul (or (range 0 9) (or (range a z) (range A Z)) _))) ID
