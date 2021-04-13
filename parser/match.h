@@ -7,6 +7,6 @@
 
 #include "AST.h"
 
-ast_node *recursive_apply(symbol *s, int token);
+ast_node *recursive_apply(symbol *s, int *token);
 
 #endif //CSCANNER_MATCH_H

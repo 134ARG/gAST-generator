@@ -27,8 +27,18 @@ static void parse_s() {
                 if (token == BAR) {
                     new_production(s);
                     token = next_token();
+                    if (token == BAR) {
+                        //extend_empty(s);
+                        continue;
+                    } else if (token == SEMICOLON) {
+                        break;
+                    }
                 }
-                if (token != SYMBOL) parse_error("Not a symbol.");
+                if (token != SYMBOL) {
+                    printf("text is: %s\n", Text);
+                    parse_error("Not a symbol.");
+
+                }
                 extend_by_name(s, Text);
             }
         }

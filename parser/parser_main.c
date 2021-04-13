@@ -15,14 +15,14 @@
 
 void print_tree(ast_node *tree, int nest) {
     if (!tree->type) {
-        printf("%*c", nest, '\t');
-        printf("terminal: %lu - %s\n", tree->code, get(&token_names, tree->code));
+        printf("%*c", 4*nest, ' ');
+        printf("|-> terminal: %s", get(&token_names, tree->code));
+        printf(": %s\n", tree->s);
         return;
     }
 
-    stack *tmp = make_stack();
-    printf("%*c", nest, '\t');
-    printf("non-terminal: %lu - %s\n", tree->code, get(&symbol_names, tree->code));
+    printf("%*c", 4*nest, ' ');
+    printf("|-> non-terminal: %s\n", get(&symbol_names, tree->code));
     for (int i = 0; i < tree->expr->length; i++) {
         ast_node *current = get(tree->expr, i);
 
@@ -36,16 +36,28 @@ void parser_main(const char *path) {
 
     int token = next_token_s();
 
-    while (token != -1) {
-
-        for (int i = 0; i < symbols.length; i++) {
-            ast_node *tree = recursive_apply(get(&symbols, i), token);
-            if (tree) {
-                print_tree(tree, 1);
-                printf("----\n");
-            }
+    symbol *general = get(&symbols, 0);
+    printf("2:%s\n", get(&symbol_names, 2));
+    ast_node  *tree = recursive_apply(general, &token);
+    if (tree) {
+        if (tree->type != EMPTY) {
+            print_tree(tree, 1);
+            printf("----\n");
         }
-        token = next_token_s();
     }
+
+//    while (token != -1) {
+//        ast_node *tree;
+//        for (int i = 0; i < symbols.length; i++) {
+//            tree = recursive_apply(get(&symbols, i), &token);
+//            if (tree) {
+//                if (tree->type != EMPTY) {
+//                    print_tree(tree, 1);
+//                    printf("----\n");
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
 }

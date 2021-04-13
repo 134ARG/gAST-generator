@@ -32,8 +32,10 @@ int issymbol(int ch) {
             || iscolon(ch) || issemi(ch) || isbar(ch));
 }
 
+int isempty(const char *str) {
+    return !strcmp(str, "EMPTY");
+}
+
 char *copy_string(const char *str) {
-    char *p = malloc(sizeof(char)*(strlen(str)+1));
-    strcpy(p, str);
-    return p;
+    return strdup(str);
 }

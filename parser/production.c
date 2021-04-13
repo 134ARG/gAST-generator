@@ -43,6 +43,11 @@ void extend_by_name(symbol *s, const char *name) {
     }
 }
 
+void extend_empty(symbol *s) {
+    if (s->type == TERMINAL) return;
+    extend_production(s, make_symbol(0, EMPTY));
+}
+
 void extend_by_stack(symbol *s, stack *symbol_stack, size_t start, size_t end) {
     copy_stack(symbol_stack, top(s->value.productions), start, end);
 }

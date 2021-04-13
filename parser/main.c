@@ -13,7 +13,7 @@ int main() {
     init_globals();
     sparse_main("./test.tokens");
 
-    p_sparse_main("./test.productions");
+    p_sparse_main("./test.productions3");
     debug_print_symbol();
 
     parser_main("./test.source");

@@ -14,27 +14,34 @@ ast_node *make_atom(symbol *s) {
     return p;
 }
 
-ast_node *make_expr() {
+ast_node *make_expr(symbol *s) {
     ast_node *p = malloc(sizeof(ast_node));
     p->type = 1;
+    p->code = s->code;
     p->expr = make_stack();
     return p;
 }
 
+ast_node *make_empty() {
+    ast_node *p = malloc(sizeof(ast_node));
+    p->type = EMPTY;
+    return p;
+}
+
 void push_node(ast_node *n, ast_node *t) {
-    if (n->type) {
+    if (n->type == EXPR) {
         push(n->expr, t);
     }
 }
 
 void clean_ast(ast_node *n) {
-    if (n->type) {
+    if (n->type == EXPR) {
         clean(n->expr);
     }
 }
 
 void destruct_node(ast_node *n) {
-    if (n->type == 1) {
+    if (n->type == EXPR) {
         destruct(n->expr);
         free(n->expr);
     }
@@ -42,11 +49,13 @@ void destruct_node(ast_node *n) {
 }
 
 void destruct_tree(ast_node *n) {
-    if (!n->type) destruct_node(n);
-    else {
+    if (n->type == EXPR) {
         for (int i = 0; i < n->expr->length; i++) {
             destruct_node(get(n->expr, i));
         }
         free(n);
+    }
+    else {
+        destruct_node(n);
     }
 }

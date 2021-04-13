@@ -27,6 +27,8 @@ symbol *make_symbol(size_t code, symbol_type type);
 void destruct_symbol(symbol *s);
 void new_production(symbol *s);
 void extend_by_name(symbol *s, const char *name);
+void extend_empty(symbol *s);
 void reduce_left_recursion(symbol *s);
+int has_empty(symbol *s);
 
 #endif //CSCANNER_PRODUCTION_H

@@ -89,6 +89,16 @@ void scanner_main(const char *input, const char *output) {
     clean_scan();
 }
 
+void str_copy(char *dest, char *src, size_t begin, size_t end) {
+    for (int i = begin; i < end; i++) {
+        dest[i-begin] = src[i];
+        //printf("%c", src[i]);
+    }
+    //printf("end\n");
+
+    dest[end - begin] = '\0';
+}
+
 // main routine for scanner
 int next_token_s() {
     static size_t index = 0;
@@ -96,12 +106,12 @@ int next_token_s() {
     static char *s = NULL;
 
     if (!s) s = next_unit();
+    if (!s) return -1;
     if (index >= strlen(s)) {
         free(s);
         index = prev = 0;
         s = next_unit();
     }
-
     if (!s) return -1;
 
     prev = index;
@@ -111,7 +121,10 @@ int next_token_s() {
         //printf("%.*s: %s\n", (int) (index - prev), s + prev, token);
         if (text) free(text);
         text = malloc(sizeof(char) * (index - prev + 1));
-        strncpy(text, s+prev, index-prev);
+        //printf("%.*s: %s\n", (int) (index - prev), s + prev, token);
+        //strncpy(text, s+prev, index-prev);
+        str_copy(text, s, prev, index);
+        //printf("%s test\n", text);
         //printf("token code:%ul\n", token_code);
         return token_code;
     } else {    // token not found

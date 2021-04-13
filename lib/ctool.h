@@ -12,6 +12,7 @@ int iscolon(int ch);
 int issemi(int ch);
 int isbar(int ch);
 int issymbol(int ch);
+int isempty(const char *str);
 
 char *copy_string(const char *str);
 
