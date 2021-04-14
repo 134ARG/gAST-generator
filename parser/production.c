@@ -79,6 +79,7 @@ symbol *gensym() {
     char *p = malloc(size + 1);
     p[size] = '\0';
     symbol *tmp = get_symbol(p);
+    tmp->type = TMP;
     free(p);
     return tmp;
 }
@@ -93,7 +94,7 @@ void reduce_left_recursion(symbol *s) {
     for (size_t i = 0; i < ps->length; i++) {
         stack *p = get(ps, i);
         symbol *first = get(p, 0);
-        if (s->code == first->code) {
+        if (first && s->code == first->code) {
             push(recursion, p);
         } else {
             push(non_recursion, p);
@@ -141,14 +142,6 @@ int has_empty(symbol *s) {
     return 0;
 }
 
-stack *predict(symbol *s) {
-    if (s->type == TERMINAL) return NULL;
-
-}
-
-void parse_table() {
-
-}
 
 
 

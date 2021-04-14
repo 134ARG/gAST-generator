@@ -8,7 +8,7 @@
 #include "../lib/stack.h"
 #include "stdlib.h"
 
-typedef enum {TERMINAL, NONTERMINAL, } symbol_type;
+typedef enum {TERMINAL, NONTERMINAL, TMP, } symbol_type;
 
 typedef struct production {
     stack *symbols;

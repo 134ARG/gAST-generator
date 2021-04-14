@@ -43,7 +43,12 @@ ast_node *recursive_apply(symbol *s, int *token) {
                 symbol *t = get(p, j);
                 ast_node *r = recursive_apply(t, token);
                 if (!r) {
-                    match_error("Not LL(1) grammar.");
+                    if (t->type == TERMINAL)
+                        printf("symbol: %s\n", get(&token_names, t->value.token_id));
+                    else if (t->type == NONTERMINAL)
+                        printf("symbol: %s\n", get(&symbol_names, t->code));
+                    printf("text: %s\n", text);
+                    match_error("Unfinished production or invalid LL(1) grammar.");
                 }
                 if (r->type != EMPTY) push_node(tree, r);
             }
@@ -51,5 +56,6 @@ ast_node *recursive_apply(symbol *s, int *token) {
         }
     }
     if (has_empty(s)) return make_empty();
+    //match_error("No production matches.");
     return NULL;
 }

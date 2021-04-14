@@ -9,9 +9,17 @@
 #include "../scanner/scanner_globals.h"
 #include "parser_globals.h"
 #include "../lib/stack.h"
+#include "../lib/sscanner.h"
 #include "AST.h"
 #include "match.h"
 #include <stdio.h>
+
+
+static void parse_error(const char *message) {
+    printf("lineno: %d: Error while parsing: %s\n", lineno, message);
+    fprintf(stderr, "lineno: %d: Error while parsing: %s\n", lineno, message);
+    exit(1);
+}
 
 void print_tree(ast_node *tree, int nest) {
     if (!tree->type) {
@@ -19,14 +27,18 @@ void print_tree(ast_node *tree, int nest) {
         printf("|-> terminal: %s", get(&token_names, tree->code));
         printf(": %s\n", tree->s);
         return;
-    }
+    } else {
+        symbol *s = get(&symbols, tree->code);
+        if (s->type != TMP) {
+            printf("%*c", 4 * nest, ' ');
+            printf("|-> non-terminal: %s\n", get(&symbol_names, tree->code));
+            nest++;
+        }
 
-    printf("%*c", 4*nest, ' ');
-    printf("|-> non-terminal: %s\n", get(&symbol_names, tree->code));
-    for (int i = 0; i < tree->expr->length; i++) {
-        ast_node *current = get(tree->expr, i);
-
-        print_tree(current, nest+1);
+        for (int i = 0; i < tree->expr->length; i++) {
+            ast_node *current = get(tree->expr, i);
+            print_tree(current, nest);
+        }
     }
 }
 
@@ -46,18 +58,9 @@ void parser_main(const char *path) {
         }
     }
 
-//    while (token != -1) {
-//        ast_node *tree;
-//        for (int i = 0; i < symbols.length; i++) {
-//            tree = recursive_apply(get(&symbols, i), &token);
-//            if (tree) {
-//                if (tree->type != EMPTY) {
-//                    print_tree(tree, 1);
-//                    printf("----\n");
-//                    break;
-//                }
-//            }
-//        }
-//    }
+    if (token != -1) {
+        parse_error("Unmatched token remains.");
+    }
 
+    destruct_tree(tree);
 }

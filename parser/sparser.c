@@ -49,6 +49,9 @@ void p_sparse_main(const char *path) {
     init_pglobals();
     open_file(path);
     parse_s();
+    for (int i = 0; i < symbols.length; i++) {
+        reduce_left_recursion(get(&symbols, i));
+    }
     clean_scan();
 //    destruct_pglobals();
 }
