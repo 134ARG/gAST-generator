@@ -44,16 +44,14 @@ void print_tree(ast_node *tree, int nest) {
 
 void parser_main(const char *path) {
     init_scan(path);
-    stack *s = make_stack();
 
     int token = next_token_s();
 
     symbol *general = get(&symbols, 0);
-    printf("2:%s\n", get(&symbol_names, 2));
     ast_node  *tree = recursive_apply(general, &token);
     if (tree) {
         if (tree->type != EMPTY) {
-            print_tree(tree, 1);
+            print_tree(tree, 0);
             printf("----\n");
         }
     }
