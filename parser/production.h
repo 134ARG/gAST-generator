@@ -10,10 +10,12 @@
 
 typedef enum {TERMINAL, NONTERMINAL, TMP, } symbol_type;
 
+// not used
 typedef struct production {
     stack *symbols;
 } production;
 
+// used for expressing nonterminals
 typedef struct symbol {
     size_t code;
     symbol_type type;

@@ -7,8 +7,6 @@
 #include "parser_globals.h"
 #include "../scanner/scanner_main.h"
 #include "../scanner/scanner_globals.h"
-#include "parser_globals.h"
-#include "../lib/stack.h"
 #include "../lib/sscanner.h"
 #include "AST.h"
 #include "match.h"
@@ -21,17 +19,18 @@ static void parse_error(const char *message) {
     exit(1);
 }
 
+// function for printing the final parsing tree recursively
 void print_tree(ast_node *tree, int nest) {
     if (!tree->type) {
-        printf("%*c", 4*nest, ' ');
-        printf("|-> terminal: %s", get(&token_names, tree->code));
+        printf("%*c", 2*nest, ' ');
+        printf("|-> terminal: %s", (char *)get(&token_names, tree->code));
         printf(": %s\n", tree->s);
         return;
     } else {
         symbol *s = get(&symbols, tree->code);
         if (s->type != TMP) {
-            printf("%*c", 4 * nest, ' ');
-            printf("|-> non-terminal: %s\n", get(&symbol_names, tree->code));
+            printf("%*c", 2 * nest, ' ');
+            printf("|-> non-terminal: %s\n", (char *)get(&symbol_names, tree->code));
             nest++;
         }
 
@@ -42,11 +41,13 @@ void print_tree(ast_node *tree, int nest) {
     }
 }
 
+// main procedure for parsing source
 void parser_main(const char *path) {
     init_scan(path);
 
     int token = next_token_s();
 
+    // read first nonterminal as starting point
     symbol *general = get(&symbols, 0);
     ast_node  *tree = recursive_apply(general, &token);
     if (tree) {

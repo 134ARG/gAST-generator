@@ -3,14 +3,13 @@
 //
 
 #include "production.h"
-#include "../lib/stack.h"
 #include "./AST.h"
 #include "../scanner/scanner_globals.h"
-#include "../scanner/scanner_main.h"
 #include "parser_globals.h"
 #include <time.h>
 #include <stdlib.h>
 
+// symbol constructor
 symbol *make_symbol(size_t code, symbol_type type) {
     symbol *p = malloc(sizeof(struct symbol));
     p->code = code;
@@ -24,12 +23,13 @@ symbol *make_symbol(size_t code, symbol_type type) {
     return p;
 }
 
+// adding symbol to top production
 void extend_production(symbol *s, symbol *p) {
     push(top(s->value.productions), p);
 }
 
+// integrated operation for symbol construction and extension of production
 void extend_by_name(symbol *s, const char *name) {
-//    symbol *s = top(&symbols);
     if (s->type == TERMINAL) return;
 
     size_t token_code = get_token_code(name);
@@ -43,21 +43,23 @@ void extend_by_name(symbol *s, const char *name) {
     }
 }
 
+// unused
 void extend_empty(symbol *s) {
     if (s->type == TERMINAL) return;
     extend_production(s, make_symbol(0, EMPTY));
 }
 
+// unused
 void extend_by_stack(symbol *s, stack *symbol_stack, size_t start, size_t end) {
     copy_stack(symbol_stack, top(s->value.productions), start, end);
 }
 
-
+// add new production stack
 void new_production(symbol *s) {
     push(s->value.productions, make_stack());
 }
 
-
+// iterator. not used
 void iterate_productions(symbol *s, void (*f)(symbol *s, stack *p)) {
     if (s->type == TERMINAL) return;
     stack *ps = s->value.productions;
@@ -67,6 +69,7 @@ void iterate_productions(symbol *s, void (*f)(symbol *s, stack *p)) {
     }
 }
 
+// generating tmp nonterminal for reduction. see report for details
 symbol *gensym() {
     time_t t = time(NULL);
     time_t base = '0';
@@ -84,7 +87,7 @@ symbol *gensym() {
     return tmp;
 }
 
-
+// as the name shows
 void reduce_left_recursion(symbol *s) {
     if (s->type == TERMINAL) return;
     stack *ps = s->value.productions;
@@ -134,6 +137,7 @@ void destruct_symbol(symbol *s) {
     free(s);
 }
 
+// whether the symbol contains empty (lambda) production
 int has_empty(symbol *s) {
     for (int i = 0; i < s->value.productions->length; i++) {
         stack *p = get(s->value.productions, i);

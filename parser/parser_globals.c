@@ -10,11 +10,12 @@
 #include <string.h>
 #include "stdio.h"
 
+// unused currently. Will be in assignment 4
 stack matched_text;
+// strings for token names
 stack symbol_names;
+// symbol structs
 stack symbols;
-
-//int lineno;
 
 void init_pglobals() {
     init_stack(&matched_text);
@@ -39,6 +40,7 @@ void clean_text() {
     clean(&matched_text);
 }
 
+// if exists, return symbol. If not, insert new one
 symbol* get_symbol(const char *name) {
     for (size_t i = 0; i < symbol_names.length; i++) {
         if (!strcmp(name, get(&symbol_names, i))) {
@@ -50,10 +52,10 @@ symbol* get_symbol(const char *name) {
     return top(&symbols);
 }
 
-
+// only for debug: print every nonterminal
 void debug_print_symbol() {
     for (int i = 0; i < symbols.length; i++) {
-        printf("%d: Symbol Name:%s\n", i, get(&symbol_names, i));
+        printf("%d: Symbol Name:%s\n", i, (char *)get(&symbol_names, i));
         symbol *s = get(&symbols, i);
         stack *p = s->value.productions;
         for (int j = 0; j < p->length; j++) {
@@ -61,9 +63,9 @@ void debug_print_symbol() {
             for (int k = 0; k < p1->length; k++) {
                 symbol *s1 = get(p1, k);
                 if (s1->type == TERMINAL) {
-                    printf("\t%lu: %s ", s1->value.token_id, get(&token_names, s1->value.token_id));
+                    printf("\t%lu: %s ", s1->value.token_id, (char *)get(&token_names, s1->value.token_id));
                 } else {
-                    printf("\t%lu: %s ", s1->code, get(&symbol_names, s1->code));
+                    printf("\t%lu: %s ", s1->code, (char *)get(&symbol_names, s1->code));
                 }
 
             }

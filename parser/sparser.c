@@ -14,6 +14,7 @@ static void parse_error(const char *message) {
     exit(1);
 }
 
+// parser for nonterminal definition file
 static void parse_s() {
     int token;
 
@@ -45,6 +46,7 @@ static void parse_s() {
     }
 }
 
+// booster
 void p_sparse_main(const char *path) {
     init_pglobals();
     open_file(path);

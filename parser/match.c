@@ -17,7 +17,9 @@ static void match_error(const char *message) {
     exit(1);
 }
 
+// main matching process following paring graph
 ast_node *recursive_apply(symbol *s, int *token) {
+    // base case for recursion
     if (s->type == TERMINAL) {
         if (s->value.token_id == *token) {
             ast_node *n = make_atom(s);
@@ -28,11 +30,13 @@ ast_node *recursive_apply(symbol *s, int *token) {
         return NULL;
     }
 
+    // if input is nonterminal
     for (int i = 0; i < s->value.productions->length; i++) {
         stack *p = get(s->value.productions, i);
         symbol *first = get(p, 0);
         if (first == NULL) continue;
         ast_node *tree = make_expr(s);
+        // first test. Refer to report for details
         ast_node *first_test = recursive_apply(first, token);
 
         if (first_test) {
@@ -44,9 +48,9 @@ ast_node *recursive_apply(symbol *s, int *token) {
                 ast_node *r = recursive_apply(t, token);
                 if (!r) {
                     if (t->type == TERMINAL)
-                        printf("symbol: %s\n", get(&token_names, t->value.token_id));
+                        printf("symbol: %s\n", (char *)get(&token_names, t->value.token_id));
                     else if (t->type == NONTERMINAL)
-                        printf("symbol: %s\n", get(&symbol_names, t->code));
+                        printf("symbol: %s\n", (char *)get(&symbol_names, t->code));
                     printf("text: %s\n", text);
                     match_error("Unfinished production or invalid LL(1) grammar.");
                 }
@@ -56,6 +60,5 @@ ast_node *recursive_apply(symbol *s, int *token) {
         }
     }
     if (has_empty(s)) return make_empty();
-    //match_error("No production matches.");
     return NULL;
 }

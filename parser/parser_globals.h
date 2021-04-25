@@ -7,7 +7,7 @@
 
 #include "production.h"
 
-
+// see parser_globals.c
 extern stack matched_text;
 extern stack symbol_names;
 extern stack symbols;

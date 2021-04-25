@@ -2,11 +2,11 @@
 // Created by xen134 on 8/4/2021.
 //
 
-#include "parser_globals.h"
-#include "sparser.h"
-#include "parser_main.h"
-#include "../scanner/scanner_globals.h"
-#include "../scanner/sparser.h"
+#include "parser/parser_globals.h"
+#include "parser/sparser.h"
+#include "parser/parser_main.h"
+#include "scanner/scanner_globals.h"
+#include "scanner/sparser.h"
 #include <string.h>
 #include <stdio.h>
 
