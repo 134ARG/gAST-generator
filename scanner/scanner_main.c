@@ -7,7 +7,6 @@
 #include "spredicate.h"
 #include "../lib/sscanner.h"
 #include "scanner_globals.h"
-#include "../lib/stack.h"
 #include "../lib/sstring.h"
 #include <string.h>
 #include <stdio.h>
@@ -19,14 +18,14 @@
 char *text;
 
 static void scan_error(const char *message) {
-    printf("lineno: %d: Error while scanning source: %s\n", lineno, message);
-    fprintf(stderr, "lineno: %d: Error while scanning source: %s\n", lineno, message);
+    printf("lineno: %d: Error while scanning source: %s\n", get_lineno(), message);
+    fprintf(stderr, "lineno: %d: Error while scanning source: %s\n", get_lineno(), message);
 }
 
 // read one unit from input file
 int read_unit(struct sstring *str) {
     char ch = next_char(0);
-    while (!isblank(ch) && !iscntrl(ch)) {
+    while (!isblank(ch) && !iscntrl(ch) && ch != -2 && ch != -1) {
 //        if (ch == '\\') {
 //            ch = next_char(0);
 //        }
@@ -70,7 +69,7 @@ void scanner_main(const char *input, const char *output) {
             size_t prev = index;
             int token_code = languagep(s, &index);  // find token id
             if (token_code != -1) {
-                const char *token = get(&token_names, token_code);
+                const char *token = get_token_name(token_code);
                 if (out_file)
                     fprintf(out_file, "%.*s: %s\n", (int) (index - prev), s + prev, token);
                 else
@@ -106,8 +105,7 @@ int next_token_s() {
     static char *s = NULL;
 
     if (!s) s = next_unit();
-    if (!s) return -1;
-    if (index >= strlen(s)) {
+    if (s && index >= strlen(s)) {
         free(s);
         index = prev = 0;
         s = next_unit();
@@ -117,15 +115,9 @@ int next_token_s() {
     prev = index;
     int token_code = languagep(s, &index);  // find token id
     if (token_code != -1) {
-        const char *token = get(&token_names, token_code);
-        //printf("%.*s: %s\n", (int) (index - prev), s + prev, token);
         if (text) free(text);
         text = malloc(sizeof(char) * (index - prev + 1));
-        //printf("%.*s: %s\n", (int) (index - prev), s + prev, token);
-        //strncpy(text, s+prev, index-prev);
         str_copy(text, s, prev, index);
-        //printf("%s test\n", text);
-        //printf("token code:%ul\n", token_code);
         return token_code;
     } else {    // token not found
         scan_error(s);

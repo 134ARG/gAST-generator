@@ -118,8 +118,6 @@ enum token_type next_token() {
     }
 }
 
-
-
 // free memories
 void clean_scan() {
     if (!Text) {
@@ -131,4 +129,16 @@ void clean_scan() {
         input = NULL;
     }
     lineno = 0;
+}
+
+int get_lineno() {
+    return lineno;
+}
+
+void zero_lineno() {
+    lineno = 0;
+}
+
+const char *current_text() {
+    return Text;
 }

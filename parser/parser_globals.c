@@ -52,20 +52,32 @@ symbol* get_symbol(const char *name) {
     return top(&symbols);
 }
 
+symbol *get_symbol_by_code(size_t code) {
+    return get(&symbols, code);
+}
+
+size_t symbols_length() {
+    return symbols.length;
+}
+
+const char *get_symbol_name(size_t code) {
+    get(&symbol_names, code);
+}
+
 // only for debug: print every nonterminal
 void debug_print_symbol() {
     for (int i = 0; i < symbols.length; i++) {
         printf("%d: Symbol Name:%s\n", i, (char *)get(&symbol_names, i));
         symbol *s = get(&symbols, i);
-        stack *p = s->value.productions;
+        stack *p = s->productions;
         for (int j = 0; j < p->length; j++) {
             stack *p1 = get(p, j);
             for (int k = 0; k < p1->length; k++) {
                 symbol *s1 = get(p1, k);
                 if (s1->type == TERMINAL) {
-                    printf("\t%lu: %s ", s1->value.token_id, (char *)get(&token_names, s1->value.token_id));
+                    printf("\t%lu: %s ", s1->code, get_token_name(s1->code));
                 } else {
-                    printf("\t%lu: %s ", s1->code, (char *)get(&symbol_names, s1->code));
+                    printf("\t%lu: %s ", s1->code, get_symbol_name(s1->code));
                 }
 
             }
@@ -73,3 +85,8 @@ void debug_print_symbol() {
         }
     }
 }
+
+stack *symbols_stack() {
+    return &symbols;
+}
+

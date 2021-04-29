@@ -8,9 +8,9 @@
 #include "production.h"
 
 // see parser_globals.c
-extern stack matched_text;
-extern stack symbol_names;
-extern stack symbols;
+//extern stack matched_text;
+//extern stack symbol_names;
+//extern stack symbols;
 
 void init_pglobals();
 void destruct_pglobals();
@@ -18,6 +18,10 @@ void push_text(const char *str);
 void clean_text();
 
 symbol* get_symbol(const char *name);
+symbol *get_symbol_by_code(size_t code);
+size_t symbols_length();
+stack *symbols_stack();
+const char *get_symbol_name(size_t code);
 
 void debug_print_symbol();
 #endif //CSCANNER_SCANNER_GLOBALS_H

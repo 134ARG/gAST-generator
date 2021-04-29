@@ -14,8 +14,8 @@
 
 
 static void parse_error(const char *message) {
-    printf("lineno: %d: Error while parsing: %s\n", lineno, message);
-    fprintf(stderr, "lineno: %d: Error while parsing: %s\n", lineno, message);
+    printf("lineno: %d: Error while parsing: %s\n", get_lineno(), message);
+    fprintf(stderr, "lineno: %d: Error while parsing: %s\n", get_lineno(), message);
     exit(1);
 }
 
@@ -23,14 +23,14 @@ static void parse_error(const char *message) {
 void print_tree(ast_node *tree, int nest) {
     if (!tree->type) {
         printf("%*c", 2*nest, ' ');
-        printf("|-> terminal: %s", (char *)get(&token_names, tree->code));
+        printf("|-> terminal: %s", get_token_name(tree->code));
         printf(": %s\n", tree->s);
         return;
     } else {
-        symbol *s = get(&symbols, tree->code);
+        symbol *s = get_symbol_by_code(tree->code);
         if (s->type != TMP) {
             printf("%*c", 2 * nest, ' ');
-            printf("|-> non-terminal: %s\n", (char *)get(&symbol_names, tree->code));
+            printf("|-> non-terminal: %s\n", get_symbol_name(tree->code));
             nest++;
         }
 
@@ -48,7 +48,7 @@ void parser_main(const char *path) {
     int token = next_token_s();
 
     // read first nonterminal as starting point
-    symbol *general = get(&symbols, 0);
+    symbol *general = get_symbol_by_code(0);
     ast_node  *tree = recursive_apply(general, &token);
     if (tree) {
         if (tree->type != EMPTY) {

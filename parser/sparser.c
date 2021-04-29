@@ -9,8 +9,8 @@
 #include <stdio.h>
 
 static void parse_error(const char *message) {
-    printf("lineno: %d: Error while parsing s-script: %s\n", lineno, message);
-    fprintf(stderr, "lineno: %d: Error while parsing s-script: %s\n", lineno, message);
+    printf("lineno: %d: Error while parsing s-script: %s\n", get_lineno(), message);
+    fprintf(stderr, "lineno: %d: Error while parsing s-script: %s\n", get_lineno(), message);
     exit(1);
 }
 
@@ -20,7 +20,7 @@ static void parse_s() {
 
     while ((token = next_token()) && token != EOSCAN) {
         if (token == SYMBOL) {
-            symbol *s = get_symbol(Text);
+            symbol *s = get_symbol(current_text());
             token = next_token();
             if (token != COLON) parse_error("No specifier.");
             new_production(s);
@@ -36,11 +36,11 @@ static void parse_s() {
                     }
                 }
                 if (token != SYMBOL) {
-                    printf("text is: %s\n", Text);
+                    printf("text is: %s\n", current_text());
                     parse_error("Not a symbol.");
 
                 }
-                extend_by_name(s, Text);
+                extend_by_name(s, current_text());
             }
         }
     }
@@ -51,8 +51,8 @@ void p_sparse_main(const char *path) {
     init_pglobals();
     open_file(path);
     parse_s();
-    for (int i = 0; i < symbols.length; i++) {
-        reduce_left_recursion(get(&symbols, i));
+    for (int i = 0; i < symbols_length(); i++) {
+        reduce_left_recursion(get(symbols_stack(), i));
     }
     clean_scan();
 //    destruct_pglobals();

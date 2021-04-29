@@ -10,7 +10,7 @@
 ast_node *make_atom(symbol *s) {
     ast_node *p = malloc(sizeof(ast_node));
     p->type = 0;
-    p->code = s->value.token_id;
+    p->code = s->code;
     return p;
 }
 

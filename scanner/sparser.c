@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 #include "sparser.h"
 #include "../lib/sscanner.h"
 #include "../lib/stack.h"
@@ -11,16 +13,26 @@
 #include "../lib/ctool.h"
 #include "scanner_globals.h"
 
-extern char *Text;
+//extern char *Text;
 extern struct stack regex;
-extern int lineno;
+//extern int lineno;
 
 /*
  * used for parser error report
  */
-static void parse_error(const char *message) {
-    printf("lineno: %d: Error while parsing s-script: %s\n", lineno, message);
-    fprintf(stderr, "lineno: %d: Error while parsing s-script: %s\n", lineno, message);
+static void parse_error(const char *fmt, ...) {
+    va_list valist;
+    va_start(valist, fmt);
+    printf("lineno: %d: Error while parsing s-script:\n", get_lineno());
+    fprintf(stderr, "lineno: %d: Error while parsing s-script:\n", get_lineno());
+    printf(fmt, valist);
+    fprintf(stderr, fmt, valist);
+    va_end(valist);
+    exit(1);
+}
+
+void new_regex(expression *p) {
+    push(&regex, p);
 }
 
 /*
@@ -37,19 +49,16 @@ void parse_s() {
             nest++;
             unit = next_token();
             if (unit != SYMBOL) {
-                parse_error("no function name specified.");
-                exit(1);
+                parse_error("no function name specified.\n");
             }
 
-            int code = get_funcode(Text);
+            int code = get_funcode(current_text());
             if (code == -1) {
-                parse_error("no such function found.");
-                parse_error(Text);
-                exit(1);
+                parse_error("no such function found: %s\n", current_text());
             }
             expression *p = make_expression(EXPR, code, make_stack());
             if (nest == 1) {        // new token
-                push(&regex, p);
+                new_regex(p);
             } else {
                 expression *current = top(expr_stack);
                 push(current->value.param, p);
@@ -62,15 +71,13 @@ void parse_s() {
             if (nest == 0) {
                 unit = next_token();
                 if (unit != SYMBOL) {
-                    parse_error(Text);
-                    parse_error("No token name specified.");
-                    exit(1);
+                    parse_error("%s: No token name specified.", current_text());
                 }
-                add_token_name(Text);
+                add_token(current_text());
             }
         } else {
             expression *p = top(expr_stack);
-            push(p->value.param, make_expression(ATOM, -1, copy_string(Text)));
+            push(p->value.param, make_expression(ATOM, -1, strdup(current_text())));
         }
         unit = next_token();
     }

@@ -19,10 +19,7 @@ typedef struct production {
 typedef struct symbol {
     size_t code;
     symbol_type type;
-    union {
-        int64_t token_id;
-        stack *productions;
-    } value;
+    stack *productions;
 } symbol;
 
 symbol *make_symbol(size_t code, symbol_type type);

@@ -44,7 +44,7 @@ int get_funcode(const char *name) {
     return -1;
 }
 
-size_t add_token_name(const char *name) {
+size_t add_token(const char *name) {
     push(&token_names, copy_string(name));
     return token_names.length - 1;
 }
@@ -57,3 +57,9 @@ size_t get_token_code(const char *name) {
     }
     return -1;
 }
+
+const char *get_token_name(size_t code) {
+    return get(&token_names, code);
+}
+
+
