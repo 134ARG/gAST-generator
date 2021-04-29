@@ -7,11 +7,6 @@
 
 #include "production.h"
 
-// see parser_globals.c
-//extern stack matched_text;
-//extern stack symbol_names;
-//extern stack symbols;
-
 void init_pglobals();
 void destruct_pglobals();
 void push_text(const char *str);

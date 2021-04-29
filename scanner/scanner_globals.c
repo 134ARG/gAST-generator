@@ -8,11 +8,6 @@
 #include "scanner_globals.h"
 #include "../lib/ctool.h"
 
-
-// for scanner (both for script and source file)
-//int lineno = 0;
-//char *Text = NULL;
-
 // for sparser
 stack regex;
 stack token_names;

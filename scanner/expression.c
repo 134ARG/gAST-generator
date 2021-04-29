@@ -5,8 +5,6 @@
 #include "expression.h"
 #include "../lib/stack.h"
 #include <malloc.h>
-#include <string.h>
-#include "scanner_globals.h"
 
 expression *make_expression(int type, int funcode, void *data) {
     expression *p = malloc(sizeof(struct expression));

@@ -7,7 +7,6 @@
 #include "../lib/error_report.h"
 #include "parser_globals.h"
 #include "production.h"
-#include <stdio.h>
 
 static void parse_error(const char *fmt, ...) {
     va_list valist;
@@ -38,7 +37,7 @@ static void parse_script() {
                     }
                 }
                 if (token != SYMBOL) {
-                    parse_error("Not a symbol:%s\n", current_text());
+                    parse_error("Not a symbol: %s\n", current_text());
 
                 }
                 extend_by_name(s, current_text());

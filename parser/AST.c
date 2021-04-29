@@ -4,7 +4,6 @@
 
 #include "AST.h"
 #include "production.h"
-#include "../lib/stack.h"
 #include <malloc.h>
 
 ast_node *make_atom(symbol *s) {

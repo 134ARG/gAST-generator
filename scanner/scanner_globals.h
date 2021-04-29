@@ -10,12 +10,6 @@
 
 #include "../lib/stack.h"
 
-//extern int lineno;
-//extern char *Text;
-//extern stack regex;
-//extern stack token_names;
-//extern char funcodes[][FUNCSIZE];
-
 void init_globals();
 void destruct_globals();
 
