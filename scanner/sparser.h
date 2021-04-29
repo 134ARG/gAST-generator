@@ -5,7 +5,7 @@
 #ifndef CSCANNER_SCANNER_SPARSER_H
 #define CSCANNER_SCANNER_SPARSER_H
 
-void parse_s();
+void parse_script();
 void sparse_main(const char *path);
 
 #endif //CSCANNER_SCANNER_SPARSER_H

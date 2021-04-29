@@ -4,25 +4,27 @@
 
 #include "sparser.h"
 #include "../lib/sscanner.h"
+#include "../lib/error_report.h"
 #include "parser_globals.h"
 #include "production.h"
 #include <stdio.h>
 
-static void parse_error(const char *message) {
-    printf("lineno: %d: Error while parsing s-script: %s\n", get_lineno(), message);
-    fprintf(stderr, "lineno: %d: Error while parsing s-script: %s\n", get_lineno(), message);
-    exit(1);
+static void parse_error(const char *fmt, ...) {
+    va_list valist;
+    va_start(valist, fmt);
+    general_error("Error while parsing non-terminal definitions", get_lineno(), fmt, valist);
+    va_end(valist);
 }
 
 // parser for nonterminal definition file
-static void parse_s() {
+static void parse_script() {
     int token;
 
     while ((token = next_token()) && token != EOSCAN) {
         if (token == SYMBOL) {
             symbol *s = get_symbol(current_text());
             token = next_token();
-            if (token != COLON) parse_error("No specifier.");
+            if (token != COLON) parse_error("No specifier.\n");
             new_production(s);
             while ((token = next_token()) && token != SEMICOLON) {
                 if (token == BAR) {
@@ -36,8 +38,7 @@ static void parse_s() {
                     }
                 }
                 if (token != SYMBOL) {
-                    printf("text is: %s\n", current_text());
-                    parse_error("Not a symbol.");
+                    parse_error("Not a symbol:%s\n", current_text());
 
                 }
                 extend_by_name(s, current_text());
@@ -50,7 +51,7 @@ static void parse_s() {
 void p_sparse_main(const char *path) {
     init_pglobals();
     open_file(path);
-    parse_s();
+    parse_script();
     for (int i = 0; i < symbols_length(); i++) {
         reduce_left_recursion(get(symbols_stack(), i));
     }

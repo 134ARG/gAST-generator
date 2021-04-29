@@ -34,11 +34,11 @@ Notice:
 
 ##### Nonterminal definition parsing
 
-The parsing process is done by function `parse_s()` in `/parser/sparser.c`. It relies on the general scanner function `next_token()` defined in `/lib/sscanner.c` which will return next token once invoked.
+The parsing process is done by function `parse_script()` in `/parser/sparser.c`. It relies on the general scanner function `next_token()` defined in `/lib/sscanner.c` which will return next token once invoked.
 
 Nonterminal is expressed as a struct `symbol` defined in `productions.h` which contains a pointer to a stack for storing productions. `symbol` has two types, one is `NONTERMINAL`, the other is `TERMINAL`, or token. Since production is a linear collection of nonterminals and terminals, it is represented by a stack of symbols. Thus the stack pointer in struct `symbol` points to a stack of stack (production). And the production stack stores other symbols. Thus, for `NONTERMINAL` symbol, it is a parsing graph by itself (not tree since recursion may present).
 
-`parse_s()` will generate new symbols and insert the productions. This is done by function  `get_symbol()` (for adding new nonterminals), `new_production()` (for add a new stack in the productions stack of symbol), and `extend_by_name()` (for adding symbols to the top of productions stack by the string name).
+`parse_script()` will generate new symbols and insert the productions. This is done by function  `get_symbol()` (for adding new nonterminals), `new_production()` (for add a new stack in the productions stack of symbol), and `extend_by_name()` (for adding symbols to the top of productions stack by the string name).
 
 Nonterminals are stored in global stacks `symbols` and `symbol_names` which are for producitons and names respectively. Nonterminal and its lexical name are associated by the index stored in `symbol.code`.
 

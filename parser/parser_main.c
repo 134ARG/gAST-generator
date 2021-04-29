@@ -8,15 +8,17 @@
 #include "../scanner/scanner_main.h"
 #include "../scanner/scanner_globals.h"
 #include "../lib/sscanner.h"
+#include "../lib/error_report.h"
 #include "AST.h"
 #include "match.h"
 #include <stdio.h>
 
 
-static void parse_error(const char *message) {
-    printf("lineno: %d: Error while parsing: %s\n", get_lineno(), message);
-    fprintf(stderr, "lineno: %d: Error while parsing: %s\n", get_lineno(), message);
-    exit(1);
+static void parse_error(const char *fmt, ...) {
+    va_list valist;
+    va_start(valist, fmt);
+    general_error("Error while parsing", get_lineno(), fmt, valist);
+    va_end(valist);
 }
 
 // function for printing the final parsing tree recursively
@@ -58,7 +60,7 @@ void parser_main(const char *path) {
     }
 
     if (token != -1) {
-        parse_error("Unmatched token remains.");
+        parse_error("Unmatched token remains.\n");
     }
 
     destruct_tree(tree);

@@ -8,18 +8,22 @@
 #include "../lib/sscanner.h"
 #include "scanner_globals.h"
 #include "../lib/sstring.h"
+#include "../lib/error_report.h"
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <stdarg.h>
 
 //extern struct stack token_names;
 //extern int lineno;
 
 char *text;
 
-static void scan_error(const char *message) {
-    printf("lineno: %d: Error while scanning source: %s\n", get_lineno(), message);
-    fprintf(stderr, "lineno: %d: Error while scanning source: %s\n", get_lineno(), message);
+static void scan_error(const char *fmt, ...) {
+    va_list valist;
+    va_start(valist, fmt);
+    general_error("Error while scanning source", get_lineno(), fmt, valist);
+    va_end(valist);
 }
 
 // read one unit from input file
@@ -75,9 +79,7 @@ void scanner_main(const char *input, const char *output) {
                 else
                     printf("%.*s: %s\n", (int) (index - prev), s + prev, token);
             } else {    // token not found
-                scan_error(s);
-                scan_error("Such string doesn't match any pattern.");
-                exit(1);
+                scan_error("Such string doesn't match any pattern: %s.\n", s);
             }
 
         }
@@ -120,8 +122,7 @@ int next_token_s() {
         str_copy(text, s, prev, index);
         return token_code;
     } else {    // token not found
-        scan_error(s);
-        scan_error("Such string doesn't match any pattern.");
+        scan_error("Such string doesn't match any pattern: %s.\n", s);
         exit(1);
     }
 }

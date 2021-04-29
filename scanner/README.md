@@ -137,7 +137,7 @@ respectively.
 
 ​    `next_token()` in **sscanner.c** will return next token once called. Token types is defined in **sscanner.h**. There are four kinds of symbols: `EOSCAN`, `SYMBOL`, `LPAREN`, `RPAREN`. `EOSCAN` corresponds to `EOF`, `SYMOBL` is element in S-expression, `LPAREN is` '(', `RPAREN` is ')'. If the next token is `SYMBOL`, `next_token()` will also store the string that matches `SYMBOL` to global variable `Text` which defined in **globals.c**. `next_token()` will call `next_char()` to go through the script file. `next_char(`) read the file line by line to reduce the number of syscalls and it also maintains the global variable ` lineno` which stores the current line number for error report.
 
-​    `parse_s()` in **sparser.c** will complete the parse process. It processes the input token by the rules of S-expression mentioned above to generate the memory expression of S-expressions. These expressions are stored in global variable `regex`, which is a simple stack implemented in **stack.c**. Also, it stores token name into global variable `token_names`, which is also a stack.
+​    `parse_script()` in **sparser.c** will complete the parse process. It processes the input token by the rules of S-expression mentioned above to generate the memory expression of S-expressions. These expressions are stored in global variable `regex`, which is a simple stack implemented in **stack.c**. Also, it stores token name into global variable `token_names`, which is also a stack.
 
 After reading the script and generating corresponding regex in memory, the procession of script is finished. Next is the procession of source files.
 

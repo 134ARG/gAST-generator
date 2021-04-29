@@ -9,13 +9,11 @@
 #include "sparser.h"
 #include "../lib/sscanner.h"
 #include "../lib/stack.h"
+#include "../lib/error_report.h"
 #include "expression.h"
-#include "../lib/ctool.h"
 #include "scanner_globals.h"
 
-//extern char *Text;
 extern struct stack regex;
-//extern int lineno;
 
 /*
  * used for parser error report
@@ -23,12 +21,8 @@ extern struct stack regex;
 static void parse_error(const char *fmt, ...) {
     va_list valist;
     va_start(valist, fmt);
-    printf("lineno: %d: Error while parsing s-script:\n", get_lineno());
-    fprintf(stderr, "lineno: %d: Error while parsing s-script:\n", get_lineno());
-    printf(fmt, valist);
-    fprintf(stderr, fmt, valist);
+    general_error("Error while parsing s-script", get_lineno(), fmt, valist);
     va_end(valist);
-    exit(1);
 }
 
 void new_regex(expression *p) {
@@ -38,7 +32,7 @@ void new_regex(expression *p) {
 /*
  * parse the script file and generate token definition
  */
-void parse_s() {
+void parse_script() {
     // nest and expr_stack are used to handle nested S-expression
     int nest = 0;
     int unit = next_token();
@@ -88,6 +82,6 @@ void parse_s() {
  */
 void sparse_main(const char *path) {
     open_file(path);
-    parse_s();
+    parse_script();
     clean_scan();
 }
