@@ -12,6 +12,9 @@
 #include "AST.h"
 #include "match.h"
 #include <stdio.h>
+#include <string.h>
+
+#include "../code_gen/code_gen.h"
 
 
 static void parse_error(const char *fmt, ...) {
@@ -23,16 +26,58 @@ static void parse_error(const char *fmt, ...) {
 
 // function for printing the final parsing tree recursively
 void print_tree(ast_node *tree, int nest) {
-    if (!tree->type) {
+    if (tree == NULL) {
+        printf("%*c", 2 * nest, ' ');
+        printf("|-> NULL for tmp slot\n");
+    } else
+    if (is_token(tree)) {
         printf("%*c", 2*nest, ' ');
         printf("|-> terminal: %s", get_token_name(tree->code));
         printf(": %s\n", tree->s);
         return;
     } else {
         symbol *s = get_symbol_by_code(tree->code);
-        if (s->type != TMP) {
+        if (!s || s->type != TMP) {
+//            if (is_nonterminal(tree, "exp")) {
+//                ast_node *l = flatten(tree);
+//                show_leaves(l);
+//                copy_node(exp_to_prefix(l), tree);
+//                printf("\n");
+            /*} else*/ if (is_nonterminal(tree, "var_declarations")) {
+                copy_node(declration_reassigner(flatten(tree)), tree);
+            } else if (is_nonterminal(tree, "if_statement")) {
+                ast_node *l = statement_reassigner(flatten(tree));
+                l->type = IF;
+                l->s = strdup("IF");
+                //show_leaves(l);
+                copy_node(l, tree);
+            } else if (is_nonterminal(tree, "while_statement")) {
+                ast_node *l = statement_reassigner(flatten(tree));
+                l->type = WHILE;
+                l->s = strdup("WHILE");
+                //show_leaves(l);
+                copy_node(l, tree);
+            } else if (is_nonterminal(tree, "do_while_statement")) {
+                ast_node *l = statement_reassigner(flatten(tree));
+                l->type = DO;
+                l->s = strdup("DO");
+                //show_leaves(l);
+                copy_node(l, tree);
+            } else if (is_nonterminal(tree, "return_statement")) {
+                ast_node *l = statement_reassigner(flatten(tree));
+                l->type = RETURN;
+                l->s = strdup("RETURN");
+                //show_leaves(l);
+                copy_node(l, tree);
+            }
+//            else if (is_nonterminal(tree, "exp")) {
+//                ast_node *l = flatten(tree);
+////                show_leaves(l);
+//                copy_node(exp_to_prefix(l), tree);
+//            }
+
             printf("%*c", 2 * nest, ' ');
-            printf("|-> non-terminal: %s\n", get_symbol_name(tree->code));
+            printf("|-> non-terminal: %s, %s\n", get_symbol_name(tree->code), tree->s);
             nest++;
         }
 
@@ -40,6 +85,17 @@ void print_tree(ast_node *tree, int nest) {
             ast_node *current = get(tree->expr, i);
             print_tree(current, nest);
         }
+        if (is_nonterminal(tree, "code_block") || is_nonterminal(tree, "statement_block")) {
+            ast_node *l = statement_reassigner(flatten(tree));
+            l->type = STATEMENT;
+            l->s = strdup("STATEMENT");
+            //show_leaves(l);
+            copy_node(l, tree);
+        }
+        else if (tree->type == ARI) {
+            copy_node(exp_to_prefix(tree), tree);
+        }
+
     }
 }
 
@@ -56,6 +112,7 @@ void parser_main(const char *path) {
         if (tree->type != EMPTY) {
             print_tree(tree, 0);
             printf("----\n");
+            print_tree(tree, 0);
         }
     }
 

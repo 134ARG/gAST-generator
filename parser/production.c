@@ -94,7 +94,7 @@ void reduce_left_recursion(symbol *s) {
     for (size_t i = 0; i < ps->length; i++) {
         stack *p = get(ps, i);
         symbol *first = get(p, 0);
-        if (first && s->code == first->code) {
+        if (first && s->code == first->code && s->type == NONTERMINAL && first->type == NONTERMINAL) {
             push(recursion, p);
         } else {
             push(non_recursion, p);

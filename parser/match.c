@@ -35,7 +35,7 @@ ast_node *recursive_apply(symbol *s, int *token) {
         stack *p = get(s->productions, i);
         symbol *first = get(p, 0);
         if (first == NULL) continue;
-        ast_node *tree = make_expr(s);
+        ast_node *tree = make_expr_with_symbol(s);
         // first test. Refer to report for details
         ast_node *first_test = recursive_apply(first, token);
 

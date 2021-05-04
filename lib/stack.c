@@ -86,6 +86,17 @@ void *get(struct stack *s, size_t index) {
     }
 }
 
+void set(stack *s, size_t index, void *data) {
+    if (index > s->length) return;
+    s->data[index] = data;
+}
+
+void swap(stack *s, size_t id1, size_t id2) {
+    void *tmp = get(s, id1);
+    set(s, id1, get(s, id2));
+    set(s, id2, tmp);
+}
+
 void copy_stack(stack *s, stack *d, size_t start, size_t end) {
     if (end < start || start > s->length) return;
     if (end > s->length) end = s->length;
@@ -94,6 +105,13 @@ void copy_stack(stack *s, stack *d, size_t start, size_t end) {
     if (d->data) free(d->data);
     d->data = malloc(d->size * sizeof(void *));
     d->data = memcpy(d->data, s->data+start, d->length*sizeof(void *));
+}
+
+int cat_stack(stack *s, stack *d) {
+    if (d == NULL || s == NULL) return 1;
+    for (int i = 0; i < d->length; i++) {
+        push(s, get(d, i));
+    }
 }
 
 void free_content(struct stack *s) {
@@ -114,4 +132,22 @@ void clean(struct stack *s) {
 	init_stack(s);
 }
 
+stack *filter(int (*predicate)(void *), stack *p) {
+    stack *r = make_stack();
+    for (int i = 0; i < p->length; i++) {
+        if (predicate(get(p, i))) {
+            push(r, get(p, i));
+        }
+    }
+    return r;
+}
 
+stack *map(return_type (f)(void *, size_t), stack *p) {
+    stack *r = make_stack();
+    for (int i = 0; i < p->length; i++) {
+        return_type res = f(get(p, i), i);
+        if (res.flag)
+            push(r, res.val);
+    }
+    return r;
+}
