@@ -108,7 +108,10 @@ void copy_stack(stack *s, stack *d, size_t start, size_t end) {
 }
 
 int cat_stack(stack *s, stack *d) {
-    if (d == NULL || s == NULL) return 1;
+    if (d == NULL || s == NULL) {
+        printf("errorrrrrrrrrrrrrr!\n");
+        return 1;
+    }
     for (int i = 0; i < d->length; i++) {
         push(s, get(d, i));
     }
@@ -150,4 +153,18 @@ stack *map(return_type (f)(void *, size_t), stack *p) {
             push(r, res.val);
     }
     return r;
+}
+
+void *find(return_type (*f)(void *, size_t), stack *p) {
+    for (int i = 0; i < p->length; i++) {
+        return_type res = f(get(p, i), i);
+        if (res.flag) {
+            return res.val;
+        }
+    }
+}
+
+void destruct_and_free(stack *s) {
+    destruct(s);
+    free(s);
 }

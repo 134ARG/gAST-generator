@@ -10,25 +10,178 @@
 #include <string.h>
 #include <stdio.h>
 
-#define TMP 1		// register id for holding tmp values
-#define ACC 2		// register id for storing accumulated results
+#define TMP_REG 1		// register id for holding tmp values
+#define ACC_REG 2		// register id for storing accumulated results
 #define FP "s8"
 FILE *output = NULL;
 int stack_offset = 32;
+size_t max_var_offset = 0;
+stack variables;
+
+typedef enum {OBJ, IMMEDIATE} var_type;
+
+typedef struct variable {
+    char *name;
+    int offset;
+    int type;
+} variable;
+
+variable *make_variable(const char *name, int type, size_t num) {
+    variable *p = malloc(sizeof(variable));
+    p->type = type;
+    p->offset = max_var_offset;
+    max_var_offset += num*4;
+    return p;
+}
+
+variable *get_variable(const char *name) {
+    for (int i = 0; i < variables.length; i++) {
+        variable *v = get(&variables, i);
+        if (!strcmp(name, v->name)) {
+            return v;
+        }
+    }
+    return NULL;
+
+}
+
+void add_to_list(variable *v) {
+    push(&variables, v);
+}
 
 int op_index[] = {1, 2, 3, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8, 8, 9, 9, 10};
 
-//// function for generating load (lw) operation
-//void gen_load(ast_node *o, int tmp_reg) {
-//    if (output == NULL) return;
-//    if (o->type == SYMBOL || o->type == TMP_VAL) {
-//        fprintf(output, "lw $t%d, %d($%s)\n", tmp_reg, o->offset + stack_offset, FP);
-//    } else if (o->type == IMMEDIATE) {
-//        fprintf(output, "li $t%d, %d\n", tmp_reg, o->value.immd);
-//    }
-//
-//    return;
-//}
+// function for generating load (lw) operation
+void gen_load(variable *o, int tmp_reg, int index) {
+    if (output == NULL) return;
+    if (o->type == OBJ || o->type == TMP_VAL) {
+        fprintf(output, "lw $t%d, %d($%s)\n", tmp_reg, o->offset + stack_offset, FP);
+    }
+}
+
+void gen_li(int immd, int tmp_reg) {
+    if (output == NULL) return;
+    fprintf(output, "li $t%d, %d\n", tmp_reg, immd);
+}
+
+// function for generating save (sw) operation
+void gen_save(variable *o, int tmp_reg, int index) {
+    if (output == NULL) return;
+    if (o->type == OBJ) {
+        fprintf(output, "sw $t%d, %d($%s)\n", tmp_reg, o->offset + stack_offset + index, FP);
+    }
+}
+
+return_type show_variables(void *p, size_t i) {
+    variable *v = p;
+    printf("%s : %d : %d\n", v->name, v->type, v->offset);
+    return (return_type) {0, 0};
+}
+
+return_type select_decl(void *p, size_t i) {
+    if (((ast_node *)p)->type == DECL) {
+        return (return_type) {p, 1};
+    }else {
+        return (return_type) {0, 0};
+    }
+}
+
+return_type add_symbol(void *p, size_t i) {
+    ast_node *n = p;
+    if (n->type == VAR) {
+       add_to_list(make_variable(n->s, OBJ, 1));
+    } else if (n->type == ARR) {
+        char *rem = NULL;
+        size_t size = strtol(get_nth(n, 1)->s, &rem, 10);
+        add_to_list(make_variable(n->s, OBJ, size));
+    } else if (n->type == ASSIGN) {
+        char *rem = NULL;
+        int initial_val = (int)strtol(get_nth(n, 1)->s, &rem, 10);
+        variable *v = make_variable(n->s, OBJ, 1);
+        add_to_list(v);
+
+        gen_li(initial_val, TMP_REG);
+        gen_save(v, TMP_REG, 0);
+    } else {
+        printf("errorrrrrrrrrrr!\n");
+    }
+    return (return_type) {0, 0};
+}
+
+stack *gen_symbol_list(ast_node *tree) {
+    init_stack(&variables);
+    ast_node *decl = find(select_decl, tree->expr);
+    destruct_and_free(map(add_symbol, decl->expr));
+}
+
+void gen_if_stmt(ast_node *if_stmt) {
+
+}
+
+void gen_single_ari(ast_node *op, ast_node *operand1, ast_node *operand2) {
+    int reg1, reg2;
+    variable *op1 = NULL, *op2 = NULL;
+    if (operand1) {
+        op1 = get_variable(operand1->s);
+        if (!op1) printf("errororororororororo!\n");
+    }
+
+    if (operand2) {
+        op2 = get_variable(operand2->s);
+        if (!op2) printf("errororororororororo!\n");
+    }
+
+    if (operand1 == NULL && operand2 != NULL) {
+        gen_load(op2, TMP_REG, operand2->offset);
+        reg1 = ACC_REG;
+        reg2 = TMP_REG;
+    } else if (operand1 != NULL && operand2 == NULL) {
+        gen_load(op1, TMP_REG, operand1->offset);
+        reg1 = TMP_REG;
+        reg2 = ACC_REG;
+    } else {
+        gen_load(op1, TMP_REG, operand1->offset);
+        gen_load(op2, ACC_REG, operand2->offset);
+        reg1 = TMP_REG;
+        reg2 = ACC_REG;
+    }
+
+    if (is_terminal(op, "MINUS")) {
+        fprintf(output, "sub $t%d, $t%d, $t%d\n", ACC_REG, reg1, reg2);
+    } else if (is_terminal(op, "PLUS")) {
+        fprintf(output, "sub $t%d, $t%d, $t%d\n", ACC_REG, reg1, reg2);
+    } else if (is_terminal(op, "OROR") || is_terminal(op, "OR_OP")) {
+        fprintf(output, "sub $t%d, $t%d, $t%d\n", ACC_REG, reg1, reg2);
+    }
+}
+
+void gen_exp(ast_node *ari) {
+    stack *raw = ari->expr;
+    stack *operator = make_stack();
+    stack *operand = make_stack();
+
+    for (int i = 0; i < raw->length; i++) {
+        ast_node *current = get(raw, i);
+        if (current->type == OP) push(operator, current);
+        else push(operator, current);
+
+        if (operand->length == 2) {
+            ast_node *op = pop(operator);
+
+        }
+    }
+
+}
+
+void debug_print_variables() {
+    destruct_and_free(map(show_variables, &variables));
+}
+
+
+
+
+
+
 
 /*
  * Shared function for identifying symbols
@@ -42,6 +195,7 @@ int is_nonterminal(ast_node *p, const char *str) {
 }
 
 int is_terminal(ast_node *p, const char *str) {
+    if (!p) return 0;
     if (p->type != ATOM) return 0;
     const char *name = get_token_name(p->code);
     return !strcmp(str, name);
@@ -75,8 +229,11 @@ ast_node *statement_reassigner(ast_node *n) {
  */
 
 return_type extract_ID(void *p, size_t i) {
+    ast_node *n = p;
     if (is_terminal(p, "ID")) {
-        ((ast_node *)p)->type = VAR;
+        if (is_terminal(get_nth(p, 0), "ASSIGN")) n->type = ASSIGN;
+        else if (is_terminal(get_nth(p, 0), "LSQUARE")) n->type = ARR;
+        else n->type = VAR;
         return (return_type){p, 1};
     } else {
         return (return_type) {0, 0};
@@ -128,36 +285,60 @@ return_type assign_index(void *p, size_t i) {
         return (return_type){0,0};
 }
 
+void sort(stack *s, stack *indexes) {
+    for (int i = 0; i < indexes->length; i++) {
+        size_t min = (size_t)get(indexes, i);
+        size_t min_idx = i;
+        for (int j = i; j < indexes->length; j++) {
+            size_t current = (size_t) get(indexes, j);
+            if (current < min) {
+                min = current;
+                min_idx = j;
+            }
+        }
+        swap(s, i, min_idx);
+        swap(indexes, i, min_idx);
+
+    }
+}
+
 ast_node *exp_to_prefix(ast_node *exp) {
     stack *operands = filter(is_operand, exp->expr);
     stack *operators = filter(is_operator, exp->expr);
     stack *indexes = map(assign_index, exp->expr);
     ast_node *r = make_expr();
-    r->type = ARI;
+//    r->type = ARI;
 
     int prev = 0;
     for (int i = 1; i < operators->length; i++) {
         int current = i;
         while (prev >= 0 && opcmp(get(operators, prev), get(operators, current)) >= 0) {
-            swap(operators, current, prev);
-            set(indexes, current, get(indexes, prev)+1);
-            current = prev;
-            prev = current - 1;
+//            swap(operators, current, prev);
+//            set(indexes, current, get(indexes, prev)+1);
+            set(indexes, current, get(indexes, prev));
+            set(indexes, prev, get(indexes, prev) + 1);
+//            current = prev;
+            prev = prev - 1;
         }
-        prev = current;
+//        prev = current;
     }
+    sort(operators, indexes);
 
     int op_i = 0, operand_i = 0;
     for (size_t i = 0; i < operands->length + operators->length; i++) {
         if (op_i >= operators->length || i != (size_t)get(indexes, op_i)) {
             ast_node *operand = get(operands, operand_i++);
-            if (operand->type == ARI) {
-                push_node(r, NULL);
-                cat_stack(r->expr, operand->expr);
+            if (operand->type == EXPR) {
+                push_node(r, make_node(TMP_VAL));
+                cat_stack(r->expr, exp_to_prefix(operand)->expr);
             }
             else {
-                if (is_nonterminal(operand, "INT_NUM")) operand->type = IMMD;
-                else operand->type = VAR;
+                if (is_terminal(operand, "INT_NUM")) operand->type = IMMD;
+                else if (operand->type == ARR) {
+                    operand->offset = atoi(get_nth(operand, 1)->s);
+                } else {
+                    operand->type = VAR;
+                }
                 push_node(r, operand);
             }
         } else {
@@ -205,7 +386,10 @@ ast_node *flatten(ast_node *exp) {
             if (is_nonterminal(node, "index")
                 || is_nonterminal(node, "declaration_tail")
                 || is_nonterminal(node, "assign_op")) {
-                ast_node *p = get_nth(node, 0);
+                ast_node *p = get_nth(s, 0);
+                if (is_nonterminal(node, "index")) {p->type = ARR; }
+                else if (is_nonterminal(node, "assign_op")) {p->type = ASSIGN; }
+                p->expr = make_stack();
                 cat_stack(p->expr, flatten(node)->expr);
             }
             else if (!rec_flag
@@ -215,10 +399,10 @@ ast_node *flatten(ast_node *exp) {
             else if (is_nonterminal(node, "code_block")) push_node(s, node);
             else {
                 ast_node *l = flatten(node);
-                if (is_nonterminal(node, "exp")) {
-                    l->type = ARI;
-                    l->s = strdup("ARI");
-                }
+//                if (is_nonterminal(node, "exp")) {
+//                    l->type = ARI;
+//                    l->s = strdup("ARI");
+//                }
                 push_node(s, l);
             }
 

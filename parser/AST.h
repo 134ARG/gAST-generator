@@ -8,7 +8,7 @@
 #include "production.h"
 #include "../lib/stack.h"
 
-typedef enum {ATOM, EXPR, EMPTY, DECL, VAR, ARR, STATEMENT, IF, WHILE, DO, RETURN, READ, WRITE, ASSIGN, OP, SYM, IMMD, ARI} node_type;
+typedef enum {ATOM, EXPR, EMPTY, DECL, VAR, ARR, STATEMENT, IF, WHILE, DO, RETURN, READ, WRITE, ASSIGN, OP, IMMD, ARI, TMP_VAL} node_type;
 
 // struct used for expressing parsing tree
 typedef struct ast_node{
@@ -28,6 +28,7 @@ ast_node *make_empty();
 // make expression type node (nonterminal)
 ast_node *make_expr_with_symbol(symbol *s);
 ast_node *make_expr_with_stack(stack *s);
+ast_node *make_node(int type);
 ast_node *make_expr();
 
 // add node to node expressing nonterminal symbol

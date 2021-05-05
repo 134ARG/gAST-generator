@@ -15,5 +15,9 @@ void show_prefix(stack *s);
 ast_node *flatten(ast_node *exp);
 void show_leaves(ast_node *s);
 int is_nonterminal(ast_node *p, const char *str);
+int is_terminal(ast_node *p, const char *str);
+
+stack *gen_symbol_list(ast_node *tree);
+void debug_print_variables();
 
 #endif //GAST_GENERATOR_CODE_GEN_H
