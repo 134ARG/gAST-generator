@@ -27,5 +27,6 @@ void gen_main_prologue();
 void copy_write();
 void copy_read();
 void add_extern();
+void code_gen_main(ast_node *tree, const char *output);
 
 #endif //GAST_GENERATOR_CODE_GEN_H

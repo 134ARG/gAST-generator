@@ -27,6 +27,24 @@ typedef enum {OBJ, IMMEDIATE} var_type;
 
 void gen_statement(ast_node *statements);
 
+void set_file(const char *file_name) {
+    if (!file_name) output = stdout;
+    else output = fopen(file_name, "w");
+}
+
+void code_gen_main(ast_node *tree, const char *output) {
+    set_file(output);
+    add_extern();
+    gen_main_prologue();
+    gen_symbol_list(tree);
+    gen_statements(tree);
+    gen_main_epilogue();
+    copy_read();
+    copy_write();
+}
+
+
+
 typedef struct variable {
     char *name;
     int offset;
@@ -59,8 +77,8 @@ int get_offset(ast_node *n) {
     }
     else if (n->type == TMP_VAL){
         int r = n->offset + max_var_offset;
-        n->offset = 0;
-        return r;
+//        n->offset = 0;
+        return max_var_offset;
     } else
         return 0;
 }
@@ -342,18 +360,7 @@ void gen_exp(ast_node *ari) {
     int operand_count = 0;
 
     if (raw->length == 1) {
-        ast_node *n = get_nth(ari, 0);
-//        if (n->type == ARR) {
-//            n->type = ARI;
-//            gen_exp(n);
-//            n->type = ARR;
-//            fprintf(output, "add $t3, $t%d, $zero\n", ACC_REG);
-//            fprintf(output, "addi $t3, $t3, %d\n", get_offset(ari)+stack_offset);
-//            fprintf(output, "add $t3, $t3, $%s\n", FP);
-//            fprintf(output, "lw $t%d, 0($t3)\n", ACC_REG);
-//        } else {
-            gen_load(get_nth(ari, 0), ACC_REG);
-//        }
+        gen_load(get_nth(ari, 0), ACC_REG);
         return;
     }
 
@@ -374,17 +381,22 @@ void gen_exp(ast_node *ari) {
         else operand_count++;
         push(supp, current);
 
-        while (operand_count == 2 && supp->length > 1) {
+        while (operand_count == 2 && supp->length) {
             ast_node *operand2 = pop(supp);
             ast_node *operand1 = pop(supp);
             ast_node *op = pop(supp);
+
             gen_single_ari(op, operand1, operand2);
-            if (!top(supp) ||((ast_node *)top(supp))->type != OP) operand_count = 2;
-            else operand_count = 1;
-            push(supp, NULL);
+            if (supp->length) {
+                if (((ast_node *)top(supp))->type != OP) operand_count = 2;
+                else operand_count = 1;
+                push(supp, NULL);
+            }
 
         }
     }
+
+    if (supp->length) exit(1);
 }
 
 void debug_print_variables() {
@@ -442,14 +454,8 @@ void copy_read() {
 }
 
 void add_extern() {
-    output = fopen("./test.S", "w");
     fprintf(output, ".extern scanf\n.extern printf\n");
 }
-
-
-
-
-
 
 /*
  * Shared function for identifying symbols

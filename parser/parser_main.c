@@ -25,98 +25,62 @@ static void parse_error(const char *fmt, ...) {
 }
 
 // function for printing the final parsing tree recursively
-void print_tree(ast_node *tree, int nest) {
-    if (tree->type == TMP_VAL) {
-        printf("%*c", 2 * nest, ' ');
-        printf("|-> NULL for tmp slot\n");
-        return;
-    } else
-    if (is_token(tree)) {
-        printf("%*c", 2*nest, ' ');
-        printf("|-> terminal: %s", get_token_name(tree->code));
-        printf(": %s\n", tree->s);
+void identify_statements(ast_node *tree) {
+    if (tree->type == TMP_VAL || is_token(tree)) {
         return;
     } else {
         symbol *s = get_symbol_by_code(tree->code);
         if (!s || s->type != TMP) {
-//            if (is_nonterminal(tree, "exp")) {
-//                ast_node *l = flatten(tree);
-//                show_leaves(l);
-//                copy_node(exp_to_prefix(l), tree);
-//                printf("\n");
-            /*} else*/ if (is_nonterminal(tree, "var_declarations")) {
+            if (is_nonterminal(tree, "var_declarations")) {
                 copy_node(declration_reassigner(flatten(tree)), tree);
             } else if (is_nonterminal(tree, "if_statement")) {
                 ast_node *l = statement_reassigner(flatten(tree));
                 l->type = IF;
                 l->s = strdup("IF");
-                //show_leaves(l);
                 copy_node(l, tree);
             } else if (is_nonterminal(tree, "while_statement")) {
                 ast_node *l = statement_reassigner(flatten(tree));
                 l->type = WHILE;
                 l->s = strdup("WHILE");
-                //show_leaves(l);
                 copy_node(l, tree);
             } else if (is_nonterminal(tree, "do_while_statement")) {
                 ast_node *l = statement_reassigner(flatten(tree));
                 l->type = DO;
                 l->s = strdup("DO");
-                //show_leaves(l);
                 copy_node(l, tree);
             } else if (is_nonterminal(tree, "return_statement")) {
                 ast_node *l = statement_reassigner(flatten(tree));
                 l->type = RETURN;
                 l->s = strdup("RETURN");
-                //show_leaves(l);
                 copy_node(l, tree);
             } else if (is_nonterminal(tree, "read_statement")) {
                 ast_node *l = statement_reassigner(flatten(tree));
                 l->type = READ;
                 l->s = strdup("READ");
-                //show_leaves(l);
                 copy_node(l, tree);
             } else if (is_nonterminal(tree, "write_statement")) {
                 ast_node *l = statement_reassigner(flatten(tree));
                 l->type = WRITE;
                 l->s = strdup("WRITE");
-                //show_leaves(l);
                 copy_node(l, tree);
             }
-//            else if (is_nonterminal(tree, "exp")) {
-//                ast_node *l = flatten(tree);
-////                show_leaves(l);
-//                copy_node(exp_to_prefix(l), tree);
-//            }
-
-            printf("%*c", 2 * nest, ' ');
-            printf("|-> non-terminal: %s, %s, %d\n", get_symbol_name(tree->code), tree->s, tree->type);
-            nest++;
         }
 
         for (int i = 0; i < tree->expr->length; i++) {
             ast_node *current = get(tree->expr, i);
-            print_tree(current, nest);
+            identify_statements(current);
         }
         if (is_nonterminal(tree, "code_block") || is_nonterminal(tree, "statement_block")) {
             ast_node *l = statement_reassigner(flatten(tree));
             l->type = STATEMENT;
             l->s = strdup("STATEMENT");
-            //show_leaves(l);
             copy_node(l, tree);
         }
     }
 }
 
-void print_tree2(ast_node *tree, int nest) {
-    if (tree->type == TMP_VAL) {
-        printf("%*c", 2 * nest, ' ');
-        printf("|-> NULL for tmp slot\n");
-    } else
-    if (is_token(tree)  && tree->type != ARR) {
-        printf("%*c", 2*nest, ' ');
-        printf("|-> terminal: %s", get_token_name(tree->code));
-        printf(": %s\n", tree->s);
+void prefix_exp(ast_node *tree) {
+    if (tree->type == TMP_VAL || (is_token(tree)  && tree->type != ARR)) {
         return;
     } else {
         symbol *s = get_symbol_by_code(tree->code);
@@ -127,20 +91,17 @@ void print_tree2(ast_node *tree, int nest) {
                 tree->type = ARI;
                 tree->s = strdup("ARI");
             }
-            printf("%*c", 2 * nest, ' ');
-            printf("|-> non-terminal: %s, %s, %d\n", get_symbol_name(tree->code), tree->s, tree->type);
-            nest++;
         }
 
         for (int i = 0; i < tree->expr->length; i++) {
             ast_node *current = get(tree->expr, i);
-            print_tree2(current, nest);
+            prefix_exp(current);
         }
 
     }
 }
 
-void print_tree3(ast_node *tree, int nest) {
+void print_tree(ast_node *tree, int nest) {
     if (tree->type == TMP_VAL) {
         printf("%*c", 2 * nest, ' ');
         printf("|-> NULL for tmp slot\n");
@@ -157,19 +118,16 @@ void print_tree3(ast_node *tree, int nest) {
             printf("|-> non-terminal: %s, %s, %d\n", get_symbol_name(tree->code), tree->s, tree->type);
             nest++;
         }
-//        if (tree->type == ARI) {
-//            gen_exp(tree);
-//        }
 
         for (int i = 0; i < tree->expr->length; i++) {
             ast_node *current = get(tree->expr, i);
-            print_tree3(current, nest);
+            print_tree(current, nest);
         }
     }
 }
 
 // main procedure for parsing source
-void parser_main(const char *path) {
+ast_node *parser_main(const char *path) {
     init_scan(path);
 
     int token = next_token_s();
@@ -180,29 +138,16 @@ void parser_main(const char *path) {
     if (tree) {
         if (tree->type != EMPTY) {
             printf("----\n");
-            print_tree2(tree, 0);
+            prefix_exp(tree);
             printf("--------------\n");
+            identify_statements(tree);
+            printf("--------------\n");
+
             print_tree(tree, 0);
-            printf("--------------\n");
-
-            print_tree3(tree, 0);
-            add_extern();
-            gen_main_prologue();
-            gen_symbol_list(tree);
-            gen_statements(tree);
-            gen_main_epilogue();
-            copy_read();
-            copy_write();
-
-//            gen_symbol_list(tree);
-//            printf("----\n");
-//            debug_print_variables();
-//            printf("-----\n");
-
-
-
+            return tree;
         }
     }
+    return NULL;
 
 
     if (token != -1) {

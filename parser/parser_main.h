@@ -5,6 +5,8 @@
 #ifndef CSCANNER_PARSER_MAIN_H
 #define CSCANNER_PARSER_MAIN_H
 
-void parser_main(const char *path);
+#include "AST.h"
+
+ast_node * parser_main(const char *path);
 
 #endif //CSCANNER_PARSER_MAIN_H

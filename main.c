@@ -7,6 +7,7 @@
 #include "parser/parser_main.h"
 #include "scanner/scanner_globals.h"
 #include "scanner/sparser.h"
+#include "code_gen/code_gen.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -14,6 +15,7 @@ int main(int argc, char **argv) {
     char *token_definition = NULL;
     char *nonterminal_definition = NULL;
     char *source_file = NULL;
+    char *output_file = NULL;
     int debug_flag = 0;
 
     // read CMD options
@@ -26,6 +28,8 @@ int main(int argc, char **argv) {
             nonterminal_definition = argv[++i];
         } else if (!strcmp(argv[i], "--debug")) {
             debug_flag = 1;
+        } else if (!strcmp(argv[i], "-o")) {
+            output_file = argv[++i];
         }
     }
     if (!token_definition) token_definition = "./micro_c.tokens";
@@ -41,7 +45,7 @@ int main(int argc, char **argv) {
     p_sparse_main(nonterminal_definition);
     if (debug_flag) debug_print_symbol();
 
-    parser_main(source_file);
+    code_gen_main(parser_main(source_file), output_file);
 
     destruct_pglobals();
     destruct_globals();
