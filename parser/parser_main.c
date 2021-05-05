@@ -70,6 +70,18 @@ void print_tree(ast_node *tree, int nest) {
                 l->s = strdup("RETURN");
                 //show_leaves(l);
                 copy_node(l, tree);
+            } else if (is_nonterminal(tree, "read_statement")) {
+                ast_node *l = statement_reassigner(flatten(tree));
+                l->type = READ;
+                l->s = strdup("READ");
+                //show_leaves(l);
+                copy_node(l, tree);
+            } else if (is_nonterminal(tree, "write_statement")) {
+                ast_node *l = statement_reassigner(flatten(tree));
+                l->type = WRITE;
+                l->s = strdup("WRITE");
+                //show_leaves(l);
+                copy_node(l, tree);
             }
 //            else if (is_nonterminal(tree, "exp")) {
 //                ast_node *l = flatten(tree);
@@ -101,7 +113,7 @@ void print_tree2(ast_node *tree, int nest) {
         printf("%*c", 2 * nest, ' ');
         printf("|-> NULL for tmp slot\n");
     } else
-    if (is_token(tree)) {
+    if (is_token(tree)  && tree->type != ARR) {
         printf("%*c", 2*nest, ' ');
         printf("|-> terminal: %s", get_token_name(tree->code));
         printf(": %s\n", tree->s);
@@ -111,11 +123,9 @@ void print_tree2(ast_node *tree, int nest) {
         if (!s || s->type != TMP) {
             if (is_nonterminal(tree, "exp")) {
                 ast_node *l = flatten(tree);
-                show_leaves(l);
                 copy_node(exp_to_prefix(l), tree);
                 tree->type = ARI;
                 tree->s = strdup("ARI");
-                printf("\n");
             }
             printf("%*c", 2 * nest, ' ');
             printf("|-> non-terminal: %s, %s, %d\n", get_symbol_name(tree->code), tree->s, tree->type);
@@ -135,7 +145,7 @@ void print_tree3(ast_node *tree, int nest) {
         printf("%*c", 2 * nest, ' ');
         printf("|-> NULL for tmp slot\n");
     } else
-    if (is_token(tree)) {
+    if (is_token(tree) && tree->type != ARR) {
         printf("%*c", 2*nest, ' ');
         printf("|-> terminal: %s", get_token_name(tree->code));
         printf(": %s, %d\n", tree->s, tree->type);
@@ -147,12 +157,14 @@ void print_tree3(ast_node *tree, int nest) {
             printf("|-> non-terminal: %s, %s, %d\n", get_symbol_name(tree->code), tree->s, tree->type);
             nest++;
         }
+//        if (tree->type == ARI) {
+//            gen_exp(tree);
+//        }
 
         for (int i = 0; i < tree->expr->length; i++) {
             ast_node *current = get(tree->expr, i);
             print_tree3(current, nest);
         }
-
     }
 }
 
@@ -169,12 +181,26 @@ void parser_main(const char *path) {
         if (tree->type != EMPTY) {
             printf("----\n");
             print_tree2(tree, 0);
+            printf("--------------\n");
             print_tree(tree, 0);
             printf("--------------\n");
-            print_tree3(tree, 0);
 
+            print_tree3(tree, 0);
+            add_extern();
+            gen_main_prologue();
             gen_symbol_list(tree);
-            debug_print_variables();
+            gen_statements(tree);
+            gen_main_epilogue();
+            copy_read();
+            copy_write();
+
+//            gen_symbol_list(tree);
+//            printf("----\n");
+//            debug_print_variables();
+//            printf("-----\n");
+
+
+
         }
     }
 

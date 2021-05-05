@@ -17,7 +17,15 @@ void show_leaves(ast_node *s);
 int is_nonterminal(ast_node *p, const char *str);
 int is_terminal(ast_node *p, const char *str);
 
+void gen_exp(ast_node *ari);
 stack *gen_symbol_list(ast_node *tree);
 void debug_print_variables();
+//void gen_statement(ast_node *statements);
+void gen_statements(ast_node *tree);
+void gen_main_epilogue();
+void gen_main_prologue();
+void copy_write();
+void copy_read();
+void add_extern();
 
 #endif //GAST_GENERATOR_CODE_GEN_H

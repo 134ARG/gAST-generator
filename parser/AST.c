@@ -40,9 +40,9 @@ ast_node *make_empty() {
 }
 
 void push_node(ast_node *n, ast_node *t) {
-    if (n->type == EXPR) {
+//    if (n->type == EXPR) {
         push(n->expr, t);
-    }
+//    }
 }
 
 void clean_ast(ast_node *n) {
