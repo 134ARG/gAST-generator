@@ -1,0 +1,56 @@
+int a = 1, b = 1;
+int c = 4, d, e[10], f, g= 0;
+
+f = 10;
+e[1] = 1;
+
+scanf(b);
+printf(b);
+
+while(f) {
+    e[f-1] = f;
+    printf(f);
+    printf(e[f-1]);
+    if (f != 7 || f != 6 || f != 5)
+        printf(b);
+
+    if (f != 7 && f != 6 && f != 5) {
+        printf(f);
+        printf(b+11);
+    }
+
+    f = f - 1;
+    if (f == 5) {
+        printf(99999);
+        printf(e[f]);
+    }
+
+}
+printf(123456789);
+
+f = 0;
+while(f < 10) {
+    printf(f);
+    printf(e[f]);
+    f = f + 1;
+    printf(123456789);
+    printf(1+3-4*5-(6-7));
+}
+printf(123456789);
+
+if (b) {
+	if (a) {
+	a = 1;
+
+	}
+}  else b = 2;
+
+while(a) {
+    a = 0;
+    printf(a);
+}
+do {
+    printf(e[1]);
+} while (a);
+
+

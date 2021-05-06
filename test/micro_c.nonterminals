@@ -1,0 +1,38 @@
+program : var_declarations statement_block;
+var_declarations : var_declaration var_declarations | ;
+var_declaration : INT declaration_list SEMI;
+declaration_list : declaration list_tail;
+list_tail: COMMA declaration_list | ;
+
+declaration : ID declaration_tail;
+declaration_tail: ASSIGN INT_NUM| LSQUARE INT_NUM RSQUARE | ;
+
+
+
+code_block : statement | LBRACE statements RBRACE;
+statement_block : statements;
+statements :  statement statements | ;
+statement : control_statement  | read_write_statement SEMI  | assign_statement SEMI  |SEMI;
+
+control_statement : if_statement | while_statement  | do_while_statement SEMI  | return_statement SEMI;
+read_write_statement : read_statement | write_statement;
+
+assign_statement : ID assign_op;
+assign_op: LSQUARE exp RSQUARE ASSIGN exp | ASSIGN exp;
+
+if_statement : if_stmt if_tail ;
+if_tail: ELSE code_block | ;
+if_stmt : IF LPAR exp RPAR code_block;
+
+while_statement : WHILE LPAR exp RPAR code_block;
+do_while_statement :DO code_block WHILE LPAR exp RPAR;
+
+
+read_statement : READ LPAR ID RPAR;
+write_statement : WRITE LPAR exp RPAR;
+
+return_statement : RETURN;
+
+exp: exp operator exp | NOT_OP exp | LPAR exp RPAR  | MINUS exp | INT_NUM | ID index;
+index:  LSQUARE exp RSQUARE | ;
+operator: OROR | ANDAND | OR_OP | AND_OP | EQ | NOTEQ | LT | GT  | LTEQ | GTEQ | SHL_OP | SHR_OP | PLUS | MINUS | MUL_OP | DIV_OP | NOT_OP;
