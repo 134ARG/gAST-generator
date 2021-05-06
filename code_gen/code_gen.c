@@ -3,10 +3,8 @@
 //
 
 #include "code_gen.h"
-#include "../lib/stack.h"
 #include "../parser/parser_globals.h"
 #include "../scanner/scanner_globals.h"
-#include "../parser/AST.h"
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
@@ -23,27 +21,9 @@ size_t max_var_offset = 0;
 size_t current_var_offset = 0;
 stack variables;
 
-typedef enum {OBJ, IMMEDIATE} var_type;
+int op_index[] = {1, 2, 3, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8, 8, 9, 9, 10};
 
 void gen_statement(ast_node *statements);
-
-void set_file(const char *file_name) {
-    if (!file_name) output = stdout;
-    else output = fopen(file_name, "w");
-}
-
-void code_gen_main(ast_node *tree, const char *output) {
-    set_file(output);
-    add_extern();
-    gen_main_prologue();
-    gen_symbol_list(tree);
-    gen_statements(tree);
-    gen_main_epilogue();
-    copy_read();
-    copy_write();
-}
-
-
 
 typedef struct variable {
     char *name;
@@ -51,10 +31,9 @@ typedef struct variable {
     int type;
 } variable;
 
-variable *make_variable(const char *name, int type, size_t num) {
+variable *make_variable(const char *name, size_t num) {
     variable *p = malloc(sizeof(variable));
     p->name = strdup(name);
-    p->type = type;
     p->offset = current_var_offset;
     current_var_offset += num*4;
     return p;
@@ -71,13 +50,27 @@ variable *get_variable(const char *name) {
     return NULL;
 }
 
+void set_file(const char *file_name) {
+    if (!file_name) output = stdout;
+    else output = fopen(file_name, "w");
+}
+
+void code_gen_main(ast_node *tree, const char *output_file) {
+    set_file(output_file);
+    add_extern();
+    gen_main_prologue();
+    gen_symbol_list(tree);
+    gen_statements(tree);
+    gen_main_epilogue();
+    copy_read();
+    copy_write();
+}
+
 int get_offset(ast_node *n) {
     if (n->type == ARR || n->type == VAR || n->type == ASSIGN || n->type == ATOM){
         return get_variable(n->s)->offset;
     }
     else if (n->type == TMP_VAL){
-        int r = n->offset + max_var_offset;
-//        n->offset = 0;
         return max_var_offset;
     } else
         return 0;
@@ -87,9 +80,7 @@ void add_to_list(variable *v) {
     push(&variables, v);
 }
 
-int op_index[] = {1, 2, 3, 4, 5, 5, 6, 6, 6, 6, 7, 7, 8, 8, 9, 9, 10};
 
-void gen_satements(ast_node *statements);
 
 const char*gen_label() {
     char str[64];
@@ -97,7 +88,6 @@ const char*gen_label() {
     struct timeval start;
     gettimeofday(&start, NULL);
 
-//    printf("!!!!!!!%lu\n", start.tv_sec*1000000+start.tv_usec);
     sprintf(str, "%lu", start.tv_sec*1000000+start.tv_usec);
     str[0] = 'A';
     return strdup(str);
@@ -154,15 +144,15 @@ return_type select_decl(void *p, size_t i) {
 return_type add_symbol(void *p, size_t i) {
     ast_node *n = p;
     if (n->type == VAR) {
-       add_to_list(make_variable(n->s, OBJ, 1));
+       add_to_list(make_variable(n->s, 1));
     } else if (n->type == ARR) {
         char *rem = NULL;
         size_t size = strtol(get_nth(n, 1)->s, &rem, 10);
-        add_to_list(make_variable(n->s, OBJ, size));
+        add_to_list(make_variable(n->s, size));
     } else if (n->type == ASSIGN) {
         char *rem = NULL;
         int initial_val = (int)strtol(get_nth(n, 1)->s, &rem, 10);
-        variable *v = make_variable(n->s, OBJ, 1);
+        variable *v = make_variable(n->s, 1);
         add_to_list(v);
 
         gen_li(initial_val, TMP_REG);
@@ -175,7 +165,6 @@ return_type add_symbol(void *p, size_t i) {
 }
 
 stack *gen_symbol_list(ast_node *tree) {
-//    output = stdout;
     init_stack(&variables);
     ast_node *decl = find(select_decl, tree->expr);
     destruct_and_free(map(add_symbol, decl->expr));
@@ -196,7 +185,6 @@ void gen_if_stmt(ast_node *if_stmt) {
 }
 
 void gen_while(ast_node *while_stmt) {
-
     const char *begin = gen_label();
     stack *raw = while_stmt->expr;
     const char *end = gen_label();
@@ -349,11 +337,9 @@ void gen_single_ari(ast_node *op, ast_node *operand1, ast_node *operand2) {
     } else if (is_terminal(op, "NOT_OP")) {
 
     }
-
 }
 
 void gen_exp(ast_node *ari) {
-//    output = stdout;
     stack *raw = ari->expr;
     stack *supp = make_stack();
     current_tmp = 0;
@@ -511,7 +497,6 @@ return_type extract_ID(void *p, size_t i) {
         }
         else n->type = VAR;
         max_var_offset += 4;
-//        add_symbol(p, i);
         return (return_type){p, 1};
     } else {
         return (return_type) {0, 0};
@@ -550,7 +535,7 @@ int opcmp(ast_node *op1, ast_node *op2) {
 }
 
 int is_operator(void *p) {
-    is_nonterminal(p, "operator");
+    return is_nonterminal(p, "operator");
 }
 
 int is_operand(void *p) {
@@ -577,7 +562,6 @@ void sort(stack *s, stack *indexes) {
         }
         swap(s, i, min_idx);
         swap(indexes, i, min_idx);
-
     }
 }
 
@@ -587,15 +571,12 @@ ast_node *exp_to_prefix(ast_node *exp) {
     stack *indexes = map(assign_index, exp->expr);
     ast_node *r = make_expr();
     int tmp_usage = 0;
-//    r->type = ARI;
 
     for (int i = 1; i < operators->length; i++) {
         int current = i;
         int prev = current - 1;
         while (prev >= 0 && opcmp(get(operators, prev), get(operators, current)) >= 0
                 && get(indexes, prev) < get(indexes, current)) {
-//            swap(operators, current, prev);
-//            set(indexes, current, get(indexes, prev)+1);
             for (int j = 0; j <= i; j++) {
                 if (get(indexes, j) > get(indexes, prev) && get(indexes, j) < get(indexes, current)) {
                     set(indexes, j, get(indexes, j) + 1);
@@ -603,10 +584,8 @@ ast_node *exp_to_prefix(ast_node *exp) {
             }
             set(indexes, current, get(indexes, prev));
             set(indexes, prev, get(indexes, prev) + 1);
-//            current = prev;
             prev = prev - 1;
         }
-//        prev = current;
     }
     sort(operators, indexes);
 
@@ -624,11 +603,7 @@ ast_node *exp_to_prefix(ast_node *exp) {
                 if (is_terminal(operand, "INT_NUM")) {
                     operand->type = IMMD;
                     operand->offset = atoi(operand->s);
-                }
-//                else if (operand->type == ARR) {
-//                    operand->offset = atoi(get_nth(operand, 1)->s);
-//                }
-                else if (operand->type != ARR) {
+                } else if (operand->type != ARR) {
                     operand->type = VAR;
                 }
                 push_node(r, operand);
@@ -686,30 +661,18 @@ ast_node *flatten(ast_node *exp) {
                 if (is_nonterminal(node, "index")) {
                     p->type = ARR;
                     p->expr = make_stack();
-                    ast_node *l = get_nth(node, 1);
-                    ast_node *t = flatten(l);
+                    ast_node *t = flatten(get_nth(node, 1));
                     t->code = get_symbol("exp")->code;
                     push_node(p, t);
-                    continue;
+                } else {
+                    if (is_nonterminal(node, "assign_op")) { p->type = ASSIGN; }
+                    p->expr = make_stack();
+                    cat_stack(p->expr, flatten(node)->expr);
                 }
-                else if (is_nonterminal(node, "assign_op")) {p->type = ASSIGN; }
-                p->expr = make_stack();
-                cat_stack(p->expr, flatten(node)->expr);
             }
-            else if (!rec_flag
-                    && !is_nonterminal(node, "code_block")
-                    && !is_nonterminal(node, "if_statement")
-                    && !is_nonterminal(node, "do_while_statement")) cat_stack(s->expr, flatten(node)->expr);
-            else if (is_nonterminal(node, "code_block")) push_node(s, node);
-            else {
-                ast_node *l = flatten(node);
-//                if (is_nonterminal(node, "exp")) {
-//                    l->type = ARI;
-//                    l->s = strdup("ARI");
-//                }
-                push_node(s, l);
-            }
-
+            else if (is_nonterminal(node, "code_block")) { push_node(s, node); }
+            else if (!rec_flag) { cat_stack(s->expr, flatten(node)->expr); }
+            else { push_node(s, flatten(node));}
         }
     }
     return s;
