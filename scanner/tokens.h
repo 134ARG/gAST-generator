@@ -17,5 +17,6 @@ int get_funcode(const char *name);
 size_t add_token(const char *name);
 size_t get_token_code(const char *name);
 const char *get_token_name(size_t code);
+stack *get_regex_stack();
 
 #endif //CSCANNER_SCANNER_GLOBALS_H

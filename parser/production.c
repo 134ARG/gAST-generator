@@ -4,7 +4,7 @@
 
 #include "production.h"
 #include "./AST.h"
-#include "../scanner/scanner_globals.h"
+#include "../scanner/tokens.h"
 #include "parser_globals.h"
 #include <time.h>
 #include <stdlib.h>

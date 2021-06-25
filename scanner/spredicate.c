@@ -6,12 +6,10 @@
 #include "expression.h"
 #include "../lib/stack.h"
 #include "string.h"
+#include "tokens.h"
 
 #define TRUE 1
 #define FALSE 0
-
-extern struct stack regex;
-//extern struct stack token_names;
 
 int cat(const char *str, size_t *i, struct stack *params);
 int or(const char *str, size_t *i, struct stack *params);
@@ -97,9 +95,9 @@ int range(const char *str, size_t *i, struct stack *params) {
 int languagep(const char *str, size_t *init_index) {
     size_t max_len = 0;
     int max_index = -1;
-    for (int i = 0; i < regex.length; i++) {
+    for (int i = 0; i < get_regex_stack()->length; i++) {
         size_t index = *init_index;
-        int res = apply(str, &index, get(&regex, i));
+        int res = apply(str, &index, get(get_regex_stack(), i));
 //        printf("bias:%d\n", index);
         if (res && index - *init_index > max_len) {
             max_len = index - *init_index;

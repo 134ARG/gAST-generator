@@ -5,13 +5,13 @@
 #include <string.h>
 #include "../lib/stack.h"
 #include "expression.h"
-#include "scanner_globals.h"
+#include "tokens.h"
 #include "../lib/ctool.h"
 
 // for sparser
-stack regex;
-stack token_names;
-char funcodes[][FUNCSIZE] = {"cat", "or", "pls", "mul", "range"};
+static stack regex;
+static stack token_names;
+static char funcodes[][FUNCSIZE] = {"cat", "or", "pls", "mul", "range"};
 
 // initialize global stacks
 void init_globals() {
@@ -37,6 +37,10 @@ int get_funcode(const char *name) {
         }
     }
     return -1;
+}
+
+stack *get_regex_stack() {
+    return &regex;
 }
 
 size_t add_token(const char *name) {

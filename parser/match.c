@@ -4,8 +4,8 @@
 
 #include "match.h"
 #include "AST.h"
-#include "../scanner/scanner_main.h"
-#include "../scanner/scanner_globals.h"
+#include "../scanner/scanner.h"
+#include "../scanner/tokens.h"
 #include "parser_globals.h"
 #include "../lib/sscanner.h"
 #include "../lib/ctool.h"

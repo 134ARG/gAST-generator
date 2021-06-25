@@ -5,14 +5,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include "sparser.h"
+#include "token_parser.h"
 #include "../lib/sscanner.h"
 #include "../lib/stack.h"
 #include "../lib/error_report.h"
 #include "expression.h"
-#include "scanner_globals.h"
-
-extern struct stack regex;
+#include "tokens.h"
 
 /*
  * used for parser error report
@@ -25,7 +23,7 @@ static void parse_error(const char *fmt, ...) {
 }
 
 void new_regex(expression *p) {
-    push(&regex, p);
+    push(get_regex_stack(), p);
 }
 
 /*

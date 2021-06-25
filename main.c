@@ -5,8 +5,8 @@
 #include "parser/parser_globals.h"
 #include "parser/sparser.h"
 #include "parser/parser_main.h"
-#include "scanner/scanner_globals.h"
-#include "scanner/sparser.h"
+#include "scanner/tokens.h"
+#include "scanner/token_parser.h"
 #include "code_gen/code_gen.h"
 #include <string.h>
 #include <stdio.h>

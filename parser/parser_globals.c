@@ -5,7 +5,7 @@
 #include "parser_globals.h"
 #include "production.h"
 #include "../lib/ctool.h"
-#include "../scanner/scanner_globals.h"
+#include "../scanner/tokens.h"
 #include <string.h>
 #include "stdio.h"
 

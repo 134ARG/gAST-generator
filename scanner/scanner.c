@@ -3,19 +3,16 @@
 // main scanner for source file
 //
 
-#include "scanner_main.h"
+#include "scanner.h"
 #include "spredicate.h"
 #include "../lib/sscanner.h"
-#include "scanner_globals.h"
+#include "tokens.h"
 #include "../lib/sstring.h"
 #include "../lib/error_report.h"
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <stdarg.h>
-
-//extern struct stack token_names;
-//extern int lineno;
 
 char *text;
 

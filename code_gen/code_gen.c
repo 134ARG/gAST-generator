@@ -4,7 +4,7 @@
 
 #include "code_gen.h"
 #include "../parser/parser_globals.h"
-#include "../scanner/scanner_globals.h"
+#include "../scanner/tokens.h"
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
