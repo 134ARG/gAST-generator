@@ -2,12 +2,13 @@
 <project version="4">
   <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="Remote Host (be63249b-d8e9-49ff-8860-deef320593ab)">
+      <paths name="Remote Host (9ae223b3-36d8-4829-b7fc-c3b0ce2ee980)">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/tmp.vLO9MXUg8c" local="$PROJECT_DIR$" />
+            <mapping deploy="/tmp/tmp.Luaa4PTwIv" local="$PROJECT_DIR$" web="/home/zry/clion-project/" />
           </mappings>
           <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug" />
             <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug" />
           </excludedPaths>
         </serverdata>
