@@ -10,16 +10,15 @@
 
 enum token_type {
     EOSCAN = 265,
-    SYMBOL = 259,
+    TEXT_SEG = 259,
     COLON = 260,
     SEMICOLON = 261,
     LPAREN = 262,
     RPAREN = 263,
     BAR = 264,
-
 };
 
-enum token_type next_token();
+enum token_type next_symbol();
 char next_char(int fallback);
 int open_file(const char *path);
 void clean_scan();

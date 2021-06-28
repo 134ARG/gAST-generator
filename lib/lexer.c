@@ -3,7 +3,7 @@
 // file read functions for both the script and the source
 //
 
-#include "sscanner.h"
+#include "lexer.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -70,7 +70,7 @@ char next_char(int fallback) {
 }
 
 // read one symbol from the input file
-int read_symbol(struct sstring *str) {
+static int read_segment(struct sstring *str) {
     char ch = next_char(0);
     while (issymbol(ch)) {
         if (ch == '\\') {
@@ -84,7 +84,7 @@ int read_symbol(struct sstring *str) {
 }
 
 // return next token of the input file
-enum token_type next_token() {
+enum token_type next_symbol() {
     char ch = next_char(0);
     struct sstring str;
 
@@ -96,7 +96,7 @@ enum token_type next_token() {
     if (ch == -2) {
         return EOSCAN;
     } else if (isblank(ch) || iscntrl(ch) || ch == -1) {
-        return next_token();
+        return next_symbol();
     } else if (islparen(ch)) {
         return LPAREN;
     } else if (isrparen(ch)) {
@@ -111,10 +111,10 @@ enum token_type next_token() {
         init_sstring(&str, NULL);
 //        sspush(&str, ch);
         next_char(1);
-        read_symbol(&str);
+        read_segment(&str);
         Text = copy_to(&str);
         ssdestruct(&str);
-        return SYMBOL;
+        return TEXT_SEG;
     }
 }
 
