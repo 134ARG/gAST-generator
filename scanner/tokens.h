@@ -6,14 +6,17 @@
 #ifndef CSCANNER_SCANNER_GLOBALS_H
 #define CSCANNER_SCANNER_GLOBALS_H
 
-#define FUNCSIZE 5
 
+
+#include <stdlib.h>
 #include "../lib/stack.h"
+
+
 
 void init_globals();
 void destruct_globals();
 
-int get_funcode(const char *name);
+
 size_t add_token(const char *name);
 size_t get_token_code(const char *name);
 const char *get_token_name(size_t code);

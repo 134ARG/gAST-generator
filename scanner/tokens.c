@@ -11,7 +11,7 @@
 // for sparser
 static stack regex;
 static stack token_names;
-static char funcodes[][FUNCSIZE] = {"cat", "or", "pls", "mul", "range"};
+
 
 // initialize global stacks
 void init_globals() {
@@ -29,15 +29,7 @@ void destruct_globals() {
     destruct(&token_names);
 }
 
-// get function code by name
-int get_funcode(const char *name) {
-    for (int i = 0; i < FUNCSIZE; i++) {
-        if (!strcmp(name, funcodes[i])) {
-            return i;
-        }
-    }
-    return -1;
-}
+
 
 stack *get_regex_stack() {
     return &regex;
