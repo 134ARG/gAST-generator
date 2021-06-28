@@ -7,7 +7,7 @@
 #include "parser_globals.h"
 #include "../scanner/scanner.h"
 #include "../scanner/tokens.h"
-#include "../lib/sscanner.h"
+#include "../lib/lexer.h"
 #include "../lib/error_report.h"
 #include "AST.h"
 #include "match.h"
@@ -130,7 +130,7 @@ void print_tree(ast_node *tree, int nest) {
 ast_node *parser_main(const char *path) {
     init_scan(path);
 
-    int token = next_token_s();
+    int token = next_token();
 
     // read first nonterminal as starting point
     symbol *general = get_symbol_by_code(0);

@@ -12,6 +12,16 @@
           </excludedPaths>
         </serverdata>
       </paths>
+      <paths name="Remote Host (c94c6b6f-5309-4e4a-857c-ae64902cb8ef)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/gAST-generator" local="$PROJECT_DIR$" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
     </serverData>
   </component>
 </project>

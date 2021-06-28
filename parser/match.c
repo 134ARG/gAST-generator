@@ -7,7 +7,7 @@
 #include "../scanner/scanner.h"
 #include "../scanner/tokens.h"
 #include "parser_globals.h"
-#include "../lib/sscanner.h"
+#include "../lib/lexer.h"
 #include "../lib/ctool.h"
 #include <stdio.h>
 
@@ -24,7 +24,7 @@ ast_node *recursive_apply(symbol *s, int *token) {
         if (s->code == *token) {
             ast_node *n = make_atom(s);
             n->s = copy_string(text);
-            *token = next_token_s();
+            *token = next_token();
             return n;
         }
         return NULL;

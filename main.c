@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     }
 
     init_globals();
-    sparse_main(token_definition);
+    read_token_definitions(token_definition);
 
     p_sparse_main(nonterminal_definition);
     if (debug_flag) debug_print_symbol();
