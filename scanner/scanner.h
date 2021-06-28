@@ -5,9 +5,8 @@
 #ifndef CSCANNER_SCANNER_MAIN_H
 #define CSCANNER_SCANNER_MAIN_H
 
-void scanner_main(const char *input, const char *output) ;
 void init_scan(const char *path);
-int next_token_s();
+int next_token();
 
 extern char *text;
 
