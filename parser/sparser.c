@@ -3,7 +3,7 @@
 //
 
 #include "sparser.h"
-#include "../lib/sscanner.h"
+#include "../lib/lexer.h"
 #include "../lib/error_report.h"
 #include "parser_globals.h"
 #include "production.h"
@@ -16,19 +16,19 @@ static void parse_error(const char *fmt, ...) {
 }
 
 // parser for nonterminal definition file
-static void parse_script() {
+static void parse_nonterminal() {
     int token;
 
-    while ((token = next_token()) && token != EOSCAN) {
-        if (token == SYMBOL) {
+    while ((token = next_symbol()) && token != EOSCAN) {
+        if (token == TEXT_SEG) {
             symbol *s = get_symbol(current_text());
-            token = next_token();
+            token = next_symbol();
             if (token != COLON) parse_error("No specifier.\n");
             new_production(s);
-            while ((token = next_token()) && token != SEMICOLON) {
+            while ((token = next_symbol()) && token != SEMICOLON) {
                 if (token == BAR) {
                     new_production(s);
-                    token = next_token();
+                    token = next_symbol();
                     if (token == BAR) {
                         //extend_empty(s);
                         continue;
@@ -36,7 +36,7 @@ static void parse_script() {
                         break;
                     }
                 }
-                if (token != SYMBOL) {
+                if (token != TEXT_SEG) {
                     parse_error("Not a symbol: %s\n", current_text());
 
                 }
@@ -50,7 +50,7 @@ static void parse_script() {
 void p_sparse_main(const char *path) {
     init_pglobals();
     open_file(path);
-    parse_script();
+    parse_nonterminal();
     for (int i = 0; i < symbols_length(); i++) {
         reduce_left_recursion(get(symbols_stack(), i));
     }
